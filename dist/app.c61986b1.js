@@ -117,16 +117,116 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"app.ts":[function(require,module,exports) {
+})({"engine/CerosEngine.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.CerosEngine = void 0;
+/**
+ * @author Okeowo Aderemi
+ * @description  CerosEngine handles most of the core gaming functionality, the game loop and the render operation and also setup the Canvas
+ * dom if not present in the body
+ */
+
+var CerosEngine =
+/** @class */
+function () {
+  function CerosEngine() {
+    this._debug = false; // This allows us to toggle the debugging mode for internal information if needed
+  }
+
+  Object.defineProperty(CerosEngine.prototype, "gpu", {
+    get: function get() {
+      if (!this._gpu) // Context 2D not set inform user about the message
+        {
+          if (this.isDebug) {
+            console.error('Canvas 2D Content was not set, check implementation in the code');
+          }
+        }
+
+      return this._gpu;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(CerosEngine.prototype, "stage", {
+    get: function get() {
+      return this._stage;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(CerosEngine.prototype, "isDebug", {
+    get: function get() {
+      return this._debug;
+    },
+    enumerable: false,
+    configurable: true
+  });
+
+  CerosEngine.prototype.init = function () {// Check if there is a canvas in the document and if not create one for the engine
+  };
+
+  CerosEngine.prototype.render = function () {// Allow items to be rendered on the Engine
+  };
+
+  CerosEngine.prototype.bindInput = function () {
+    document.addEventListener('keydown', function (e) {
+      return onInput(e);
+    });
+  };
+  /**
+   * Handles the Keyboard Event for the application
+   * @param e
+   */
+
+
+  CerosEngine.prototype.onInput = function (e) {
+    console.log('Key Entered: %s', e.keyCode);
+  };
+
+  CerosEngine.prototype.setDebug = function () {
+    this._debug = true;
+  };
+
+  CerosEngine.prototype.update = function () {// Make modification to the state and POS 
+  };
+
+  CerosEngine.prototype.useArcadeFont = function () {
+    if (this.stage && this.gpu) {
+      this.gpu.font = 'VT323'; // Set the font to be used for display to give arcade retro styling
+    }
+  };
+
+  CerosEngine.prototype.version = function () {
+    return 'version 1.0.0';
+  };
+
+  return CerosEngine;
+}();
+
+exports.CerosEngine = CerosEngine;
+},{}],"app.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 /**
  * @author Okeowo Aderemi
  * @description This is the main application that bootstraps the application
  */
+
+var CerosEngine_1 = require("./engine/CerosEngine");
+
 document.addEventListener('DOMContentLoaded', function (event) {
   // Start the main application here
   console.log('Gaming Engine runs now...');
+  console.log(new CerosEngine_1.CerosEngine().version());
 });
-},{}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./engine/CerosEngine":"engine/CerosEngine.ts"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;

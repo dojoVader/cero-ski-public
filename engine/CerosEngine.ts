@@ -3,7 +3,7 @@
  * @description  CerosEngine handles most of the core gaming functionality, the game loop and the render operation and also setup the Canvas
  * dom if not present in the body
  */
-export default class CerosEngine {
+export class CerosEngine {
 
 
     private _debug = false; // This allows us to toggle the debugging mode for internal information if needed
@@ -65,4 +65,9 @@ export default class CerosEngine {
             this.gpu.font = 'VT323'; // Set the font to be used for display to give arcade retro styling
         }
     }
+
+    version(){
+        return 'version 1.0.0';
+    }
 }
+
