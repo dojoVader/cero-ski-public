@@ -59,7 +59,7 @@ export class Scene implements IGameScene {
         const assetMgr = this._engine.assetManager;
 
         // Set a default instance we will update the same resource
-        const asset = assetMgr.getAsset('skierDown') as HTMLImageElement;
+        const asset = assetMgr.getAsset('skierLeft') as HTMLImageElement;
         this.skier = new Skier(asset, { width: asset.width, height: asset.height }, { x: 0, y: 0 });
 
         // Setup the collision system
