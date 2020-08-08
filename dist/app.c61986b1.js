@@ -124,17 +124,14 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.CerosEngine = void 0;
-/**
- * @author Okeowo Aderemi
- * @description  CerosEngine handles most of the core gaming functionality, the game loop and the render operation and also setup the Canvas
- * dom if not present in the body
- */
 
 var CerosEngine =
 /** @class */
 function () {
   function CerosEngine() {
     this._debug = false; // This allows us to toggle the debugging mode for internal information if needed
+
+    this.init();
   }
 
   Object.defineProperty(CerosEngine.prototype, "gpu", {
@@ -147,6 +144,16 @@ function () {
         }
 
       return this._gpu;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(CerosEngine.prototype, "dimension", {
+    get: function get() {
+      return {
+        w: this._gameWidth,
+        h: this._gameHeight
+      };
     },
     enumerable: false,
     configurable: true
@@ -166,15 +173,38 @@ function () {
     configurable: true
   });
 
-  CerosEngine.prototype.init = function () {// Check if there is a canvas in the document and if not create one for the engine
+  CerosEngine.prototype.init = function () {
+    // Check if there is a canvas in the document and if not create one for the engine
+    this._configureViewPort();
+
+    this.bindInput();
+  };
+
+  CerosEngine.prototype._configureViewPort = function () {
+    // This handles viewport information and setting up of the window for our engine
+    this._gameHeight = window.innerHeight;
+    this._gameWidth = window.innerWidth; // Do we have any canvas if not give us one
+
+    var canvasElement = document.getElementsByTagName('canvas').length ? document.getElementsByTagName('canvas').item(0) : document.createElement('canvas');
+    canvasElement.className = 'ceros-engine'; // Set the width of the canvas
+
+    $(canvasElement).attr('width', this._gameWidth * window.devicePixelRatio).attr('height', this._gameHeight * window.devicePixelRatio).css({
+      width: this._gameWidth + 'px',
+      height: this._gameHeight + 'px'
+    });
+    document.body.appendChild(canvasElement);
+    this._stage = canvasElement;
+    this._gpu = canvasElement.getContext('2d');
   };
 
   CerosEngine.prototype.render = function () {// Allow items to be rendered on the Engine
   };
 
   CerosEngine.prototype.bindInput = function () {
+    var _this = this;
+
     document.addEventListener('keydown', function (e) {
-      return onInput(e);
+      return _this.onInput(e);
     });
   };
   /**
@@ -204,10 +234,96 @@ function () {
     return 'version 1.0.0';
   };
 
+  CerosEngine.prototype.clear = function () {
+    this._gpu ? this._gpu.clearRect(0, 0, this._gameWidth, this._gameHeight) : console.error('Context 2D is missing check implementation');
+  };
+
   return CerosEngine;
 }();
 
 exports.CerosEngine = CerosEngine;
+},{}],"engine/AssetManager.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.AssetManager = void 0;
+var assets = {
+  'skierCrash': 'img/skier_crash.png',
+  'skierLeft': 'img/skier_left.png',
+  'skierLeftDown': 'img/skier_left_down.png',
+  'skierDown': 'img/skier_down.png',
+  'skierRightDown': 'img/skier_right_down.png',
+  'skierRight': 'img/skier_right.png',
+  'tree': 'img/tree_1.png',
+  'treeCluster': 'img/tree_cluster.png',
+  'rock1': 'img/rock_1.png',
+  'rock2': 'img/rock_2.png',
+  'jumpRamp': 'img/jump_ramp.png'
+};
+/**
+ * @todo Implement functionality to allow loading assets via JSON
+ */
+
+var AssetManager =
+/** @class */
+function () {
+  function AssetManager() {
+    this._trackingManager = {
+      failed: 0,
+      passed: 0
+    };
+    this._assetResourceList = assets;
+  }
+
+  AssetManager.prototype.download = function () {
+    var _this = this;
+
+    var deferredPromises = [];
+
+    _.each(assets, function (asset, assetName) {
+      var resourceImage = new Image();
+      var deferred = $.Deferred();
+
+      resourceImage.onload = function () {
+        resourceImage.width /= 2;
+        resourceImage.height /= 2;
+
+        _this.setAsset(assetName, resourceImage);
+
+        _this._trackingManager.passed++;
+        deferred.resolve();
+      };
+
+      resourceImage.onerror = function (e) {
+        _this._trackingManager.failed++;
+      }; //Set the resource to the source to trigger the events
+
+
+      resourceImage.src = asset;
+    });
+
+    return $.when.apply($, deferredPromises);
+  };
+
+  AssetManager.prototype.setAsset = function (name, resource) {
+    this._assetResourceList[name] = resource;
+  };
+
+  AssetManager.prototype.getAsset = function (name) {
+    if (!this._assetResourceList[name]) {
+      throw new Error(' Asset has not been defined in the resource list');
+      '';
+    }
+
+    return this._assetResourceList[name];
+  };
+
+  return AssetManager;
+}();
+
+exports.AssetManager = AssetManager;
 },{}],"app.ts":[function(require,module,exports) {
 "use strict";
 
@@ -221,12 +337,19 @@ Object.defineProperty(exports, "__esModule", {
 
 var CerosEngine_1 = require("./engine/CerosEngine");
 
+var AssetManager_1 = require("./engine/AssetManager");
+
 document.addEventListener('DOMContentLoaded', function (event) {
   // Start the main application here
   console.log('Gaming Engine runs now...');
   console.log(new CerosEngine_1.CerosEngine().version());
+  var asset = new AssetManager_1.AssetManager();
+  asset.download().then(function () {
+    return console.log('loaded');
+  });
+  console.log(asset);
 });
-},{"./engine/CerosEngine":"engine/CerosEngine.ts"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./engine/CerosEngine":"engine/CerosEngine.ts","./engine/AssetManager":"engine/AssetManager.ts"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;

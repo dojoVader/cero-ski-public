@@ -3,12 +3,15 @@
  * @description  CerosEngine handles most of the core gaming functionality, the game loop and the render operation and also setup the Canvas
  * dom if not present in the body
  */
+declare var $;
 export class CerosEngine {
 
 
     private _debug = false; // This allows us to toggle the debugging mode for internal information if needed
     private _gpu: CanvasRenderingContext2D; // Canvas 2D Context 
     private _stage: HTMLCanvasElement // Keeps copy of the Canvas DOM element to read height and width if neccessary
+    private _gameWidth: number;
+    private _gameHeight: number;
 
     public get gpu(): CanvasRenderingContext2D {
         if (!this._gpu) // Context 2D not set inform user about the message
@@ -20,6 +23,13 @@ export class CerosEngine {
         return this._gpu;
     }
 
+    public get dimension() {
+        return {
+            w: this._gameWidth,
+            h: this._gameHeight
+        };
+    }
+
     public get stage() {
         return this._stage;
     }
@@ -29,11 +39,33 @@ export class CerosEngine {
     }
 
     constructor() {
-
+        this.init();
     }
 
     init() {
         // Check if there is a canvas in the document and if not create one for the engine
+        this._configureViewPort();
+        this.bindInput();
+    }
+
+    _configureViewPort() {
+        // This handles viewport information and setting up of the window for our engine
+        this._gameHeight = window.innerHeight;
+        this._gameWidth = window.innerWidth;
+
+        // Do we have any canvas if not give us one
+        var canvasElement = document.getElementsByTagName('canvas').length ? document.getElementsByTagName('canvas').item(0) : document.createElement('canvas');
+        canvasElement.className = 'ceros-engine';
+        // Set the width of the canvas
+        $(canvasElement).attr('width', this._gameWidth * window.devicePixelRatio)
+            .attr('height', this._gameHeight * window.devicePixelRatio)
+            .css({
+                width: this._gameWidth + 'px',
+                height: this._gameHeight + 'px'
+            });
+        document.body.appendChild(canvasElement);
+        this._stage = canvasElement;
+        this._gpu = canvasElement.getContext('2d');
     }
 
     render() {
@@ -41,7 +73,7 @@ export class CerosEngine {
     }
 
     bindInput() {
-        document.addEventListener('keydown', (e: KeyboardEvent) => onInput(e));
+        document.addEventListener('keydown', (e: KeyboardEvent) => this.onInput(e));
     }
 
     /**
@@ -66,8 +98,13 @@ export class CerosEngine {
         }
     }
 
-    version(){
+    version() {
         return 'version 1.0.0';
     }
+
+    clear() {
+        this._gpu ? this._gpu.clearRect(0, 0, this._gameWidth, this._gameHeight) : console.error('Context 2D is missing check implementation');
+    }
+
 }
 
