@@ -9,7 +9,6 @@ import { JumpRamp } from './entity/JumpRamp';
 import { TreeCluster } from './entity/TreeCluster'
 import { AssetManager } from "./AssetManager";
 import { Skier } from './entity/Skier';
-import { Hitbox } from "./collision/Hitbox";
 
 declare var _: LoDashStatic;
 
@@ -47,7 +46,6 @@ export class Scene implements IGameScene {
     public renderableList: IRenderable[];
     private skier: Skier;
 
-    private collision: Hitbox;
 
     constructor() {
         this.renderableList = [];
@@ -65,7 +63,6 @@ export class Scene implements IGameScene {
         this.skier = new Skier(asset, { width: asset.width, height: asset.height }, { x: 0, y: 0 });
 
         // Setup the collision system
-        this.collision = new Hitbox();
         this.initialSetup();
 
         requestAnimationFrame((t) => this.render(t));
@@ -323,7 +320,6 @@ export class Scene implements IGameScene {
         var x = (w - skierImage.width) / 2;
         var y = (h - skierImage.height) / 2;
 
-        //ctx.drawImage(skierImage, x, y, skierImage.width, skierImage.height); 
         this.skier.position = {
             x,
             y
@@ -377,15 +373,37 @@ export class Scene implements IGameScene {
         return this._engine.dimension;
     }
 
-    checkIfSkierHitObstacle() {
-        // Check if the Skier has hit any obstacle
-        var collision = _.find(this.renderableList, (obstacle) => {
-            obstacle.offset = 5;
+    intersectRect(r1, r2) {
+        return !(r2.left > r1.right ||
+            r2.right < r1.left ||
+            r2.top > r1.bottom ||
+            r2.bottom < r1.top);
+    };
 
-            return this.collision.hasCollided(this.skier, obstacle);
+    checkIfSkierHitObstacle() {
+        const { w, h } = this.getDimension();
+        var skierRect = {
+            left: skierMapX + w / 2,
+            right: skierMapX + this.skier.resource.width + w / 2,
+            top: skierMapY + this.skier.resource.height - 5 + h / 2,
+            bottom: skierMapY + this.skier.resource.height + h / 2
+        };
+
+        var collision = _.find(this.renderableList, (obstacle) => {
+            var obstacleImage = obstacle.resource
+            var obstacleRect = {
+                left: obstacle.position.x,
+                right: obstacle.position.x + obstacleImage.width,
+                top: obstacle.position.y + obstacleImage.height - 5,
+                bottom: obstacle.position.y + obstacleImage.height
+            };
+
+            return this.intersectRect(skierRect, obstacleRect);
         });
 
         if (collision) {
+            const asset = this._engine.assetManager;
+            this.skier.resource = asset.getAsset('skierCrash');
             skierDirection = 0;
         }
     }
