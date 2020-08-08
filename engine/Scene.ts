@@ -67,9 +67,9 @@ export class Scene implements IGameScene {
         // Setup the collision system
         this.collision = new Hitbox();
         this.initialSetup();
-        
+
         requestAnimationFrame((t) => this.render(t));
-        
+
     }
 
     onInput(e: KeyboardEvent) {
@@ -109,20 +109,20 @@ export class Scene implements IGameScene {
     }
 
     render(e) {
-        
+
         this._engine.gpu.save();
         this._engine.gpu.scale(window.devicePixelRatio, window.devicePixelRatio);
         this._engine.clear();
-        
+
         this.moveSkier();
         this.checkIfSkierHitObstacle();
         this.drawSkier();
         this.drawObstacles();
         this._engine.gpu.restore();
         requestAnimationFrame((e) => this.render(e));
-       // console.log('Rendering...');
+        // console.log('Rendering...');
         //console.log('Direction: %s, MapX: %s, MapY: %s, speed: %s', skierDirection, skierMapX, skierMapY, skierSpeed);
-        
+
     }
     update() {
 
@@ -132,7 +132,7 @@ export class Scene implements IGameScene {
         const { w, h } = this._engine.dimension;
         let renderableItems = Math.ceil(_.random(1, 7) *
             (w / 800) * (h / 500));
-            
+
         var minX = -50;
         var maxX = w + 50;
         var minY = h / 2 + 100;
@@ -243,7 +243,7 @@ export class Scene implements IGameScene {
                 break;
 
         }
-        
+
 
     }
 
@@ -297,13 +297,13 @@ export class Scene implements IGameScene {
         // Get Engine for measurement size
         const { w, h } = this.getDimension();
         let newObstacles = [];
-   
+
         _.each(this.renderableList, (obstacle) => {
             var obstacleImage = obstacle.resource; // Image resource
             var x = obstacle.position.x - skierMapX - obstacleImage.width / 2;
             var y = obstacle.position.y - skierMapY - obstacleImage.height / 2;
 
-            
+
             if (x < -100 || x > w + 50 || y < -100 || y > h + 50) {
                 return;
             }

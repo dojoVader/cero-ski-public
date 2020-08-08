@@ -11,7 +11,7 @@ export interface IRenderable extends ICanRendererContext {
    }
 
 export interface ICanRendererContext {
-    render(engine: IGameEngine): void
+    render(engine: IGameEngine, x: number, y: number): void
 }
 
 export interface IRenderableSize {
