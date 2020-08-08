@@ -43,20 +43,16 @@ export class Scene implements IGameScene {
 
     public title;
 
-    public renderableList: IRenderable[] = []; // This list contains the items to be rendered to the canvas
-
+    // This list contains the items to be rendered to the canvas
+    public renderableList: IRenderable[];
     private skier: Skier;
 
     private collision: Hitbox;
 
     constructor() {
-
-
-
-
-
-
+        this.renderableList = [];
     }
+
     setEngine(engine: CerosEngine) {
         this._engine = engine;
     }
@@ -71,7 +67,9 @@ export class Scene implements IGameScene {
         // Setup the collision system
         this.collision = new Hitbox();
         this.initialSetup();
+        
         requestAnimationFrame((t) => this.render(t));
+        
     }
 
     onInput(e: KeyboardEvent) {
@@ -111,17 +109,20 @@ export class Scene implements IGameScene {
     }
 
     render(e) {
+        
         this._engine.gpu.save();
         this._engine.gpu.scale(window.devicePixelRatio, window.devicePixelRatio);
         this._engine.clear();
+        
         this.moveSkier();
         this.checkIfSkierHitObstacle();
         this.drawSkier();
         this.drawObstacles();
         this._engine.gpu.restore();
         requestAnimationFrame((e) => this.render(e));
-        console.log('Rendering...');
-        console.log('Direction: %s, MapX: %s, MapY: %s, speed: %s', skierDirection,skierMapX,skierMapY,skierSpeed);
+       // console.log('Rendering...');
+        //console.log('Direction: %s, MapX: %s, MapY: %s, speed: %s', skierDirection, skierMapX, skierMapY, skierSpeed);
+        
     }
     update() {
 
@@ -129,9 +130,9 @@ export class Scene implements IGameScene {
     initialSetup() {
         // Create the obstacles to be rendered to the screen
         const { w, h } = this._engine.dimension;
-        let renderableItems = Math.ceil(_.random(5, 7) *
+        let renderableItems = Math.ceil(_.random(1, 7) *
             (w / 800) * (h / 500));
-
+            
         var minX = -50;
         var maxX = w + 50;
         var minY = h / 2 + 100;
@@ -146,6 +147,7 @@ export class Scene implements IGameScene {
             return obstacle.position.y + obstacleImage.height;
         });
 
+        console.log(this.renderableList);
 
     }
 
@@ -191,9 +193,9 @@ export class Scene implements IGameScene {
                     width: asset.height
                 }, {
                     x: position.x,
-                    y: position.y + asset.height
+                    y: position.y
                 });
-
+                this.renderableList.push(renderable);
                 break;
             case 'treeCluster':
                 asset = assetMgr.getAsset('treeCluster');
@@ -202,7 +204,7 @@ export class Scene implements IGameScene {
                     width: asset.height
                 }, {
                     x: position.x,
-                    y: position.y + asset.height
+                    y: position.y
                 });
                 this.renderableList.push(renderable);
                 break;
@@ -213,8 +215,9 @@ export class Scene implements IGameScene {
                     width: asset.height
                 }, {
                     x: position.x,
-                    y: position.y + asset.height
+                    y: position.y
                 }, ROCKTYPE.ROCK1);
+                this.renderableList.push(renderable);
                 break;
             case 'rock2':
                 asset = assetMgr.getAsset('rock2');
@@ -223,8 +226,9 @@ export class Scene implements IGameScene {
                     width: asset.height
                 }, {
                     x: position.x,
-                    y: position.y + asset.height
+                    y: position.y
                 }, ROCKTYPE.ROCK2);
+                this.renderableList.push(renderable);
                 break;
             case 'jump':
                 asset = assetMgr.getAsset('jumpRamp');
@@ -233,12 +237,14 @@ export class Scene implements IGameScene {
                     width: asset.height
                 }, {
                     x: position.x,
-                    y: position.y + asset.height
+                    y: position.y
                 });
+                this.renderableList.push(renderable);
                 break;
 
         }
-        this.renderableList.push(renderable);
+        
+
     }
 
     getSkierAsset() {
@@ -291,19 +297,18 @@ export class Scene implements IGameScene {
         // Get Engine for measurement size
         const { w, h } = this.getDimension();
         let newObstacles = [];
-
+   
         _.each(this.renderableList, (obstacle) => {
             var obstacleImage = obstacle.resource; // Image resource
             var x = obstacle.position.x - skierMapX - obstacleImage.width / 2;
             var y = obstacle.position.y - skierMapY - obstacleImage.height / 2;
 
-            if (x < -100 || x > + 50 || y < -100 || y > h + 50) {
+            
+            if (x < -100 || x > w + 50 || y < -100 || y > h + 50) {
                 return;
             }
 
-            //ctx.drawImage(obstacleImage, x, y, obstacleImage.width, obstacleImage.height);
-            // Each obstacle should be drawn to the screen
-            obstacle.render(this._engine);
+            obstacle.render(this._engine, x, y);
             newObstacles.push(obstacle);
         });
 
@@ -329,7 +334,7 @@ export class Scene implements IGameScene {
             height: skierImage.height
         };
 
-        this.skier.render(this._engine);
+        this.skier.render(this._engine, x, y);
     }
 
     placeNewObstacle(direction) {
