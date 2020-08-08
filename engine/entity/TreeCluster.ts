@@ -1,14 +1,10 @@
-import { IRenderable, IRenderableSize, IRenderableOffsetPosition } from "../engine.interface";
+import { IRenderable, IRenderableSize, IRenderableOffsetPosition, ICanRendererContext } from "../engine.interface";
+import { BaseEntity } from "./BaseEntity";
 
-export class TreeCluster implements IRenderable {
-    resource: any;
-    size: IRenderableSize;
-    position: IRenderableOffsetPosition;
-
+export class TreeCluster extends BaseEntity implements IRenderable , ICanRendererContext{
     constructor(src: any, size: IRenderableSize, pos: IRenderableOffsetPosition) {
-        this.resource = src;
-        this.size = size;
-        this.position = pos;
+        super(src, size, pos);
     }
+    
 
 }

@@ -1,22 +1,132 @@
 // This Class handles the whole logic of placing objects on the screen, handling collision detection and also 
 
 import { CerosEngine } from "./CerosEngine";
-import { IRenderable } from "./engine.interface";
+import { IRenderable, IGameScene, IRenderableOffsetPosition } from "./engine.interface";
+import { LoDashStatic } from "lodash";
+import { Tree } from './entity/Tree';
+import { Rock, ROCKTYPE } from './entity/Rock';
+import { JumpRamp } from './entity/JumpRamp';
+import { TreeCluster } from './entity/TreeCluster'
+import { AssetManager } from "./AssetManager";
+import { Skier } from './entity/Skier';
+import { Hitbox } from "./collision/Hitbox";
 
-declare var _;
+declare var _: LoDashStatic;
+
+// The Items that should be randomly generated to the screen
+const renderableTypes = [
+    'tree',
+    'treeCluster',
+    'rock1',
+    'rock2',
+    'jump'
+];
+
+// Global variables for the Scene to use
+var skierDirection = 5;
+var skierMapX = 0;
+var skierMapY = 0;
+var skierSpeed = 8;
+
+const KeyboardMappings = {
+    LEFT: 37,
+    RIGHT: 39,
+    UP: 38,
+    DOWN: 40
+}
+
 
 // dealing with the pausing and stop via the engine
-export class Scene {
+export class Scene implements IGameScene {
 
     private _engine: CerosEngine;
 
-    public renderableList: IRenderable[]; // This list contains the items to be rendered to the canvas
+    public title;
 
-    constructor(engine: CerosEngine) {
+    public renderableList: IRenderable[] = []; // This list contains the items to be rendered to the canvas
+
+    private skier: Skier;
+
+    private collision: Hitbox;
+
+    constructor() {
+
+
+
+
+
+
+    }
+    setEngine(engine: CerosEngine) {
         this._engine = engine;
     }
+    init() {
+        //Set the AssetMgr
+        const assetMgr = this._engine.assetManager;
 
-    initialSetUp() {
+        // Set a default instance we will update the same resource
+        const asset = assetMgr.getAsset('skierDown') as HTMLImageElement;
+        this.skier = new Skier(asset, { width: asset.width, height: asset.height }, { x: 0, y: 0 });
+
+        // Setup the collision system
+        this.collision = new Hitbox();
+        this.initialSetup();
+        requestAnimationFrame((t) => this.render(t));
+    }
+
+    onInput(e: KeyboardEvent) {
+        switch (e.keyCode) {
+            case KeyboardMappings.LEFT: // left
+                if (skierDirection === 1) {
+                    skierMapX -= skierSpeed;
+                    this.placeNewObstacle(skierDirection);
+                }
+                else {
+                    skierDirection--;
+                }
+                e.preventDefault();
+                break;
+            case KeyboardMappings.RIGHT: // right
+                if (skierDirection === 5) {
+                    skierMapX += skierSpeed;
+                    this.placeNewObstacle(skierDirection);
+                }
+                else {
+                    skierDirection++;
+                }
+                e.preventDefault();
+                break;
+            case KeyboardMappings.UP: // up
+                if (skierDirection === 1 || skierDirection === 5) {
+                    skierMapY -= skierSpeed;
+                    this.placeNewObstacle(6);
+                }
+                e.preventDefault();
+                break;
+            case KeyboardMappings.DOWN: // down
+                skierDirection = 3;
+                e.preventDefault();
+                break;
+        }
+    }
+
+    render(e) {
+        this._engine.gpu.save();
+        this._engine.gpu.scale(window.devicePixelRatio, window.devicePixelRatio);
+        this._engine.clear();
+        this.moveSkier();
+        this.checkIfSkierHitObstacle();
+        this.drawSkier();
+        this.drawObstacles();
+        this._engine.gpu.restore();
+        requestAnimationFrame((e) => this.render(e));
+        console.log('Rendering...');
+        console.log('Direction: %s, MapX: %s, MapY: %s, speed: %s', skierDirection,skierMapX,skierMapY,skierSpeed);
+    }
+    update() {
+
+    }
+    initialSetup() {
         // Create the obstacles to be rendered to the screen
         const { w, h } = this._engine.dimension;
         let renderableItems = Math.ceil(_.random(5, 7) *
@@ -27,6 +137,252 @@ export class Scene {
         var minY = h / 2 + 100;
         var maxY = h + 50;
 
+        for (var idx = 0; idx < renderableItems; idx++) {
+            this.drawRandomRenderables(minX, maxX, minY, maxY);
+        }
+
+        this.renderableList = _.sortBy(this.renderableList, function (obstacle) {
+            var obstacleImage = obstacle.resource;
+            return obstacle.position.y + obstacleImage.height;
+        });
+
 
     }
+
+    moveSkier() {
+        switch (skierDirection) {
+            case 2:
+                skierMapX -= Math.round(skierSpeed / 1.4142);
+                skierMapY += Math.round(skierSpeed / 1.4142);
+
+                this.placeNewObstacle(skierDirection);
+                break;
+            case 3:
+                skierMapY += skierSpeed;
+
+                this.placeNewObstacle(skierDirection);
+                break;
+            case 4:
+                skierMapX += skierSpeed / 1.4142;
+                skierMapY += skierSpeed / 1.4142;
+
+                this.placeNewObstacle(skierDirection);
+                break;
+        }
+    }
+
+    private drawRandomRenderables(minX, maxX, minY, maxY) {
+        const assetMgr = this._engine.assetManager;
+        let renderableIndex = _.random(0, renderableTypes.length - 1);
+
+        var position = this.calculateOpenPosition(minX, maxX, minY, maxY);
+
+        // Get the renderable type and push to the Renderable List to be displayed
+        const renderType = renderableTypes[renderableIndex];
+
+        let renderable: IRenderable = null;
+        let asset: HTMLImageElement = null;
+
+        switch (renderType) {
+            case 'tree':
+                asset = assetMgr.getAsset('tree');
+                renderable = new Tree(asset, {
+                    height: asset.width,
+                    width: asset.height
+                }, {
+                    x: position.x,
+                    y: position.y + asset.height
+                });
+
+                break;
+            case 'treeCluster':
+                asset = assetMgr.getAsset('treeCluster');
+                renderable = new TreeCluster(asset, {
+                    height: asset.width,
+                    width: asset.height
+                }, {
+                    x: position.x,
+                    y: position.y + asset.height
+                });
+                this.renderableList.push(renderable);
+                break;
+            case 'rock1':
+                asset = assetMgr.getAsset('rock1');
+                renderable = new Rock(asset, {
+                    height: asset.width,
+                    width: asset.height
+                }, {
+                    x: position.x,
+                    y: position.y + asset.height
+                }, ROCKTYPE.ROCK1);
+                break;
+            case 'rock2':
+                asset = assetMgr.getAsset('rock2');
+                renderable = new Rock(asset, {
+                    height: asset.width,
+                    width: asset.height
+                }, {
+                    x: position.x,
+                    y: position.y + asset.height
+                }, ROCKTYPE.ROCK2);
+                break;
+            case 'jump':
+                asset = assetMgr.getAsset('jumpRamp');
+                renderable = new JumpRamp(asset, {
+                    height: asset.width,
+                    width: asset.height
+                }, {
+                    x: position.x,
+                    y: position.y + asset.height
+                });
+                break;
+
+        }
+        this.renderableList.push(renderable);
+    }
+
+    getSkierAsset() {
+        var skierAssetName;
+        switch (skierDirection) {
+            case 0:
+                skierAssetName = 'skierCrash';
+                break;
+            case 1:
+                skierAssetName = 'skierLeft';
+                break;
+            case 2:
+                skierAssetName = 'skierLeftDown';
+                break;
+            case 3:
+                skierAssetName = 'skierDown';
+                break;
+            case 4:
+                skierAssetName = 'skierRightDown';
+                break;
+            case 5:
+                skierAssetName = 'skierRight';
+                break;
+        }
+
+        return skierAssetName;
+    }
+
+
+    calculateOpenPosition(minX, maxX, minY, maxY): IRenderableOffsetPosition {
+        var x = _.random(minX, maxX);
+        var y = _.random(minY, maxY);
+
+        var foundCollision = _.find(this.renderableList, function (obstacle) {
+            return x > (obstacle.position.x - 50) && x < (obstacle.position.x + 50) && y > (obstacle.position.y - 50) && y < (obstacle.position.y + 50);
+        });
+
+        if (foundCollision) {
+            return this.calculateOpenPosition(minX, maxX, minY, maxY);
+        }
+        else {
+            return {
+                x: x,
+                y: y
+            }
+        }
+    }
+
+    drawObstacles() {
+        // Get Engine for measurement size
+        const { w, h } = this.getDimension();
+        let newObstacles = [];
+
+        _.each(this.renderableList, (obstacle) => {
+            var obstacleImage = obstacle.resource; // Image resource
+            var x = obstacle.position.x - skierMapX - obstacleImage.width / 2;
+            var y = obstacle.position.y - skierMapY - obstacleImage.height / 2;
+
+            if (x < -100 || x > + 50 || y < -100 || y > h + 50) {
+                return;
+            }
+
+            //ctx.drawImage(obstacleImage, x, y, obstacleImage.width, obstacleImage.height);
+            // Each obstacle should be drawn to the screen
+            obstacle.render(this._engine);
+            newObstacles.push(obstacle);
+        });
+
+        this.renderableList = newObstacles;
+
+    }
+
+    drawSkier() {
+        const { w, h } = this.getDimension();
+        var skierAssetName = this.getSkierAsset();
+        var skierImage = this._engine.assetManager.getAsset(skierAssetName) as HTMLImageElement;
+        var x = (w - skierImage.width) / 2;
+        var y = (h - skierImage.height) / 2;
+
+        //ctx.drawImage(skierImage, x, y, skierImage.width, skierImage.height); 
+        this.skier.position = {
+            x,
+            y
+        };
+
+        this.skier.size = {
+            width: skierImage.width,
+            height: skierImage.height
+        };
+
+        this.skier.render(this._engine);
+    }
+
+    placeNewObstacle(direction) {
+        const { w, h } = this.getDimension();
+        var shouldPlaceObstacle = _.random(1, 8);
+        if (shouldPlaceObstacle !== 8) {
+            return;
+        }
+
+        var leftEdge = skierMapX;
+        var rightEdge = skierMapX + w;
+        var topEdge = skierMapY;
+        var bottomEdge = skierMapY + h;
+
+        switch (direction) {
+            case 1: // left
+                this.drawRandomRenderables(leftEdge - 50, leftEdge, topEdge, bottomEdge);
+                break;
+            case 2: // left down
+                this.drawRandomRenderables(leftEdge - 50, leftEdge, topEdge, bottomEdge);
+                this.drawRandomRenderables(leftEdge, rightEdge, bottomEdge, bottomEdge + 50);
+                break;
+            case 3: // down
+                this.drawRandomRenderables(leftEdge, rightEdge, bottomEdge, bottomEdge + 50);
+                break;
+            case 4: // right down
+                this.drawRandomRenderables(rightEdge, rightEdge + 50, topEdge, bottomEdge);
+                this.drawRandomRenderables(leftEdge, rightEdge, bottomEdge, bottomEdge + 50);
+                break;
+            case 5: // right
+                this.drawRandomRenderables(rightEdge, rightEdge + 50, topEdge, bottomEdge);
+                break;
+            case 6: // up
+                this.drawRandomRenderables(leftEdge, rightEdge, topEdge - 50, topEdge);
+                break;
+        }
+    }
+
+    getDimension() {
+        return this._engine.dimension;
+    }
+
+    checkIfSkierHitObstacle() {
+        // Check if the Skier has hit any obstacle
+        var collision = _.find(this.renderableList, (obstacle) => {
+            obstacle.offset = 5;
+
+            return this.collision.hasCollided(this.skier, obstacle);
+        });
+
+        if (collision) {
+            skierDirection = 0;
+        }
+    }
+
 }

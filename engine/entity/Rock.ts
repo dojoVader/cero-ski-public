@@ -1,27 +1,20 @@
-import { IRenderable, IRenderableSize, IRenderableOffsetPosition } from "../engine.interface";
+import { IRenderableSize, IRenderableOffsetPosition, IRenderable, ICanRendererContext } from "../engine.interface";
+import { BaseEntity } from "./BaseEntity";
+import { CerosEngine } from "../CerosEngine";
 
-enum ROCKTYPE {
+export enum ROCKTYPE {
     ROCK1 = 1,
     ROCK2 = 2
 };
 
-export class Rock implements IRenderable {
-    public resource: any;
-    public size: IRenderableSize;
-    public position: IRenderableOffsetPosition;
+export class Rock extends BaseEntity implements IRenderable, ICanRendererContext {
     public rockType: ROCKTYPE
 
-
-
-
-    constructor(src: any, size: IRenderableSize, pos: IRenderableOffsetPosition, type: ROCKTYPE){
-        this.resource = src;
-        this.size = size;
-        this.position = pos;
-        // Set the rock type this will be alternated during the render
+    constructor(src: any, size: IRenderableSize, pos: IRenderableOffsetPosition, type: ROCKTYPE) {
+        super(src, size, pos);
         this.rockType = type;
     }
 
-    
+
 
 }

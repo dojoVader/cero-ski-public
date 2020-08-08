@@ -1,10 +1,18 @@
+import { IGameEngine, IAssetManager, IGameScene } from "./engine.interface";
+import { Scene } from "./Scene";
+
 /**
  * @author Okeowo Aderemi
  * @description  CerosEngine handles most of the core gaming functionality, the game loop and the render operation and also setup the Canvas
  * dom if not present in the body
  */
 declare var $;
-export class CerosEngine {
+
+var skierDirection = 5;
+var skierMapX = 0;
+var skierMapY = 0;
+var skierSpeed = 8;
+export class CerosEngine implements IGameEngine {
 
 
     private _debug = false; // This allows us to toggle the debugging mode for internal information if needed
@@ -12,6 +20,9 @@ export class CerosEngine {
     private _stage: HTMLCanvasElement // Keeps copy of the Canvas DOM element to read height and width if neccessary
     private _gameWidth: number;
     private _gameHeight: number;
+    private _scene: Scene;
+    assetManager: IAssetManager;
+    audioManager?: any;
 
     public get gpu(): CanvasRenderingContext2D {
         if (!this._gpu) // Context 2D not set inform user about the message
@@ -38,14 +49,20 @@ export class CerosEngine {
         return this._debug;
     }
 
-    constructor() {
-        this.init();
+
+    setScene(scene: Scene){
+        this._scene = scene;
     }
 
-    init() {
+
+    init(scene: Scene) {
         // Check if there is a canvas in the document and if not create one for the engine
+        this.setScene(scene);
+        this._scene.setEngine(this);
         this._configureViewPort();
         this.bindInput();
+        this.render();
+        
     }
 
     _configureViewPort() {
@@ -70,6 +87,7 @@ export class CerosEngine {
 
     render() {
         // Allow items to be rendered on the Engine
+        this._scene.init();
     }
 
     bindInput() {
@@ -81,7 +99,7 @@ export class CerosEngine {
      * @param e 
      */
     onInput(e: KeyboardEvent) {
-        console.log('Key Entered: %s', e.keyCode);
+        this._scene.onInput(e);
     }
 
     setDebug() {
@@ -105,6 +123,8 @@ export class CerosEngine {
     clear() {
         this._gpu ? this._gpu.clearRect(0, 0, this._gameWidth, this._gameHeight) : console.error('Context 2D is missing check implementation');
     }
+
+   
 
 }
 

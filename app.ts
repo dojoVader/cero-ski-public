@@ -4,11 +4,20 @@
  */
 import { CerosEngine } from './engine/CerosEngine';
 import { AssetManager } from './engine/AssetManager';
+import { Scene } from './engine/Scene';
 document.addEventListener('DOMContentLoaded', (event: Event) => {
     // Start the main application here
-    console.log('Gaming Engine runs now...')
-    console.log(new CerosEngine().version());
-    var asset = new AssetManager();
-    asset.download().then(()=> console.log('loaded'));
-    console.log(asset);
+    
+    const asset = new AssetManager;
+    
+    asset.download(() => {
+        const engine = new CerosEngine();
+        engine.assetManager = asset;
+        const scene = new Scene();
+        engine.init(scene);
+        console.log('Gaming Engine runs now...with Scene')
+        
+        
+    });
+    
 });

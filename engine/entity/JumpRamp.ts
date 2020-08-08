@@ -1,14 +1,12 @@
-import { IRenderable, IRenderableSize, IRenderableOffsetPosition } from "../engine.interface";
+import { IRenderableSize, IRenderableOffsetPosition, IRenderable, ICanRendererContext } from "../engine.interface";
+import { BaseEntity } from "./BaseEntity";
 
-export class JumpRamp implements IRenderable {
-    resource: any;
-    size: IRenderableSize;
-    position: IRenderableOffsetPosition;
+export class JumpRamp extends BaseEntity implements IRenderable, ICanRendererContext {
+
 
     constructor(src: any, size: IRenderableSize, pos: IRenderableOffsetPosition) {
-        this.resource = src;
-        this.size = size;
-        this.position = pos;
+        super(src, size, pos);
     }
+  
 
 }
