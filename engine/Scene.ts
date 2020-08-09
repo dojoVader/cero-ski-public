@@ -8,7 +8,7 @@ import { Rock, ROCKTYPE } from './entity/Rock';
 import { JumpRamp } from './entity/JumpRamp';
 import { TreeCluster } from './entity/TreeCluster'
 import { AssetManager } from "./AssetManager";
-import { Skier } from './entity/Skier';
+import { Skier, SkierAnimationObject } from './entity/Skier';
 
 declare var _: LoDashStatic;
 
@@ -59,8 +59,18 @@ export class Scene implements IGameScene {
         const assetMgr = this._engine.assetManager;
 
         // Set a default instance we will update the same resource
-        const asset = assetMgr.getAsset('skierLeft') as HTMLImageElement;
-        this.skier = new Skier(asset, { width: asset.width, height: asset.height }, { x: 0, y: 0 });
+        const skierAssets : SkierAnimationObject = {
+            crashed: assetMgr.getAsset('skierCrash'),
+            left: assetMgr.getAsset('skierLeft'),
+            right: assetMgr.getAsset('skierRight'),
+            leftDown: assetMgr.getAsset('skierLeftDown'),
+            rightDown: assetMgr.getAsset('skierRightDown'),
+            sking: assetMgr.getAsset('skierDown')
+        };
+
+        this.skier = new Skier(skierAssets.left, { width: skierAssets.left.width, height: skierAssets.left.height }, { x: 0, y: 0 });
+        this.skier.setAnimation(skierAssets);
+
 
         // Setup the collision system
         this.initialSetup();
@@ -75,19 +85,26 @@ export class Scene implements IGameScene {
                 if (skierDirection === 1) {
                     skierMapX -= skierSpeed;
                     this.placeNewObstacle(skierDirection);
+                    this.skier.setCurrentAnimation('left');
+                    // Change
                 }
                 else {
+                    skierMapX -= skierSpeed;
                     skierDirection--;
+                    this.skier.setCurrentAnimation('leftDown');
                 }
                 e.preventDefault();
                 break;
             case KeyboardMappings.RIGHT: // right
                 if (skierDirection === 5) {
                     skierMapX += skierSpeed;
+                    this.skier.setCurrentAnimation('right');
                     this.placeNewObstacle(skierDirection);
+                   
                 }
                 else {
                     skierDirection++;
+                    this.skier.setCurrentAnimation('rightDown');
                 }
                 e.preventDefault();
                 break;
@@ -100,25 +117,25 @@ export class Scene implements IGameScene {
                 break;
             case KeyboardMappings.DOWN: // down
                 skierDirection = 3;
+                this.skier.setCurrentAnimation('sking');
                 e.preventDefault();
                 break;
         }
     }
 
     render(e) {
-
+        const { w, h } = this.getDimension();
         this._engine.gpu.save();
         this._engine.gpu.scale(window.devicePixelRatio, window.devicePixelRatio);
-        this._engine.clear();
+        this._engine.gpu.clearRect(0, 0, w, h);
 
         this.moveSkier();
         this.checkIfSkierHitObstacle();
         this.drawSkier();
         this.drawObstacles();
-        this._engine.gpu.restore();
+        
         requestAnimationFrame((e) => this.render(e));
-        // console.log('Rendering...');
-        //console.log('Direction: %s, MapX: %s, MapY: %s, speed: %s', skierDirection, skierMapX, skierMapY, skierSpeed);
+        this._engine.gpu.restore();
 
     }
     update() {
@@ -138,14 +155,6 @@ export class Scene implements IGameScene {
         for (var idx = 0; idx < renderableItems; idx++) {
             this.drawRandomRenderables(minX, maxX, minY, maxY);
         }
-
-        this.renderableList = _.sortBy(this.renderableList, function (obstacle) {
-            var obstacleImage = obstacle.resource;
-            return obstacle.position.y + obstacleImage.height;
-        });
-
-        console.log(this.renderableList);
-
     }
 
     moveSkier() {
@@ -315,10 +324,9 @@ export class Scene implements IGameScene {
 
     drawSkier() {
         const { w, h } = this.getDimension();
-        var skierAssetName = this.getSkierAsset();
-        var skierImage = this._engine.assetManager.getAsset(skierAssetName) as HTMLImageElement;
-        var x = (w - skierImage.width) / 2;
-        var y = (h - skierImage.height) / 2;
+     
+        var x = (w - this.skier.resource.width) / 2;
+        var y = (h - this.skier.resource.height) / 2;
 
         this.skier.position = {
             x,
@@ -326,8 +334,8 @@ export class Scene implements IGameScene {
         };
 
         this.skier.size = {
-            width: skierImage.width,
-            height: skierImage.height
+            width: this.skier.resource.width,
+            height: this.skier.resource.height
         };
 
         this.skier.render(this._engine, x, y);
@@ -402,8 +410,7 @@ export class Scene implements IGameScene {
         });
 
         if (collision) {
-            const asset = this._engine.assetManager;
-            this.skier.resource = asset.getAsset('skierCrash');
+            this.skier.setCurrentAnimation('crashed');
             skierDirection = 0;
         }
     }
