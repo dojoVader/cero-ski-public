@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', (event: Event) => {
         engine.assetManager = asset;
         const scene = new Scene();
         engine.init(scene);
+        engine.useArcadeFont();
+        engine.setDebug();
         console.log('Gaming Engine runs now...with Scene')
         
         

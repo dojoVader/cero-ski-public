@@ -9,6 +9,7 @@ import { JumpRamp } from './entity/JumpRamp';
 import { TreeCluster } from './entity/TreeCluster'
 import { AssetManager } from "./AssetManager";
 import { Skier, SkierAnimationObject } from './entity/Skier';
+import { ScoreBoard, ScoreBoardPosition } from './utils/ScoreBoard';
 
 declare var _: LoDashStatic;
 
@@ -35,6 +36,8 @@ const KeyboardMappings = {
 }
 
 
+let GAME_SCORES = 0;
+
 // dealing with the pausing and stop via the engine
 export class Scene implements IGameScene {
 
@@ -45,10 +48,12 @@ export class Scene implements IGameScene {
     // This list contains the items to be rendered to the canvas
     public renderableList: IRenderable[];
     private skier: Skier;
+    private _scoreBoard: ScoreBoard = new ScoreBoard(ScoreBoardPosition.TOP_LEFT);
 
 
     constructor() {
         this.renderableList = [];
+        
     }
 
     setEngine(engine: CerosEngine) {
@@ -79,6 +84,7 @@ export class Scene implements IGameScene {
 
     }
 
+    
     onInput(e: KeyboardEvent) {
         switch (e.keyCode) {
             case KeyboardMappings.LEFT: // left
@@ -124,15 +130,19 @@ export class Scene implements IGameScene {
     }
 
     render(e) {
+        
         const { w, h } = this.getDimension();
         this._engine.gpu.save();
         this._engine.gpu.scale(window.devicePixelRatio, window.devicePixelRatio);
         this._engine.gpu.clearRect(0, 0, w, h);
 
         this.moveSkier();
+        this._scoreBoard.setScore(GAME_SCORES);
+        GAME_SCORES++;
         this.checkIfSkierHitObstacle();
         this.drawSkier();
         this.drawObstacles();
+        this._scoreBoard.render(this._engine);
         
         requestAnimationFrame((e) => this.render(e));
         this._engine.gpu.restore();
@@ -412,6 +422,10 @@ export class Scene implements IGameScene {
         if (collision) {
             this.skier.setCurrentAnimation('crashed');
             skierDirection = 0;
+            // Save the highest score and rest
+            this._scoreBoard.saveScore(GAME_SCORES);
+            GAME_SCORES = 0;
+            
         }
     }
 

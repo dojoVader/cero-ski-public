@@ -23,6 +23,12 @@ export class BaseEntity implements IRenderable {
         }
     }
     render(engine: CerosEngine, x, y): void {
-        engine.gpu.drawImage(this.resource, x, y, this.size.width, this.size.height)
+        engine.gpu.drawImage(this.resource, x, y, this.size.width, this.size.height);
+        if(engine.isDebug){
+            engine.gpu.save();
+            engine.gpu.strokeStyle = 'red';
+            engine.gpu.strokeRect(this.position.x,this.position.y, this.resource.width, this.resource.height);
+            engine.gpu.restore();
+        }
     }
 }

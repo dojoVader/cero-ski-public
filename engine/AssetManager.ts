@@ -47,8 +47,7 @@ export class AssetManager implements IAssetManager {
             let resourceImage = new Image();
 
             resourceImage.onload = () => {
-                resourceImage.width /= 2;
-                resourceImage.height /= 2;
+              
                 this.setAsset(assetName, resourceImage);
                 this._trackingManager.passed++;
                 if(this.isDone()){

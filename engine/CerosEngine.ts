@@ -112,7 +112,7 @@ export class CerosEngine implements IGameEngine {
 
     useArcadeFont() {
         if (this.stage && this.gpu) {
-            this.gpu.font = 'VT323'; // Set the font to be used for display to give arcade retro styling
+            this.gpu.font = '30px VT323'; // Set the font to be used for display to give arcade retro styling
         }
     }
 
