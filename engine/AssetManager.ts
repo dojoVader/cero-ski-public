@@ -26,7 +26,22 @@ export class AssetManager implements IAssetManager {
         'treeCluster': 'img/tree_cluster.png',
         'rock1': 'img/rock_1.png',
         'rock2': 'img/rock_2.png',
-        'jumpRamp': 'img/jump_ramp.png'
+        'jumpRamp': 'img/jump_ramp.png',
+        'skierJump1': 'img/skier_jump_1.png',
+        'skierJump2': 'img/skier_jump_2.png',
+        'skierJump3': 'img/skier_jump_3.png',
+        'skierJump4': 'img/skier_jump_4.png',
+        'skierJump5': 'img/skier_jump_5.png',
+        'rhinoDefault': 'img/rhino_default.png',
+        'rhinoLift': 'img/rhino_lift.png',
+        'rhinoLiftEat1': 'img/rhino_life_eat_1.png',
+        'rhinoLiftEat2': 'img/rhino_life_eat_2.png',
+        'rhinoLiftEat3': 'img/rhino_life_eat_3.png',
+        'rhinoLiftEat4': 'img/rhino_life_eat_4.png',
+        'rhinoLiftEatMouthOpen': 'img/rhino_lift_mouth_open.png',
+        'rhinoRunLeft':'img/rhino_run_left.png',
+        
+
     };
     private _assetResourceList: object = {}; // This stores the list of the assets to be downloaded
 
@@ -35,37 +50,38 @@ export class AssetManager implements IAssetManager {
         passed: 0
     }
 
-    isDone(){
-        return (this._trackingManager.failed + this._trackingManager.passed ) === Object.keys(this.assets).length
+    isDone() {
+        return (this._trackingManager.failed + this._trackingManager.passed) === Object.keys(this.assets).length
     }
-    
+
 
     public download(cb: Function) {
-        
+
         _.each(this.assets, (asset, assetName) => {
-         
+
             let resourceImage = new Image();
 
             resourceImage.onload = () => {
-              
+                resourceImage.width /= 2;
+                resourceImage.height /= 2;
                 this.setAsset(assetName, resourceImage);
                 this._trackingManager.passed++;
-                if(this.isDone()){
+                if (this.isDone()) {
                     cb();
                 }
-                
+
             }
 
             resourceImage.onerror = (e) => {
                 this._trackingManager.failed++;
-                if(this.isDone()){
+                if (this.isDone()) {
                     cb();
                 }
             }
             //Set the resource to the source to trigger the events
             resourceImage.src = asset;
         });
-        
+
     }
 
     setAsset(name: string, resource: any) {

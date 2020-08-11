@@ -9,9 +9,13 @@ import { JumpRamp } from './entity/JumpRamp';
 import { TreeCluster } from './entity/TreeCluster'
 import { AssetManager } from "./AssetManager";
 import { Skier, SkierAnimationObject } from './entity/Skier';
-import { ScoreBoard, ScoreBoardPosition } from './utils/ScoreBoard';
+import { ScoreBoard, ScoreBoardPosition, PauseInfo } from './utils/utils';
 
 declare var _: LoDashStatic;
+
+let frameCount = 15;
+
+const FPS = 30;
 
 // The Items that should be randomly generated to the screen
 const renderableTypes = [
@@ -21,6 +25,8 @@ const renderableTypes = [
     'rock2',
     'jump'
 ];
+
+let gameAnimationResourceHandle: number = null; // This is the ID we will need to pause 
 
 // Global variables for the Scene to use
 var skierDirection = 5;
@@ -32,8 +38,10 @@ const KeyboardMappings = {
     LEFT: 37,
     RIGHT: 39,
     UP: 38,
-    DOWN: 40
-}
+    DOWN: 40,
+    PAUSE: 80,
+    LETTER_J: 74
+};
 
 
 let GAME_SCORES = 0;
@@ -42,6 +50,8 @@ let GAME_SCORES = 0;
 export class Scene implements IGameScene {
 
     private _engine: CerosEngine;
+
+    private _pauseHelper: PauseInfo;
 
     public title;
 
@@ -53,8 +63,11 @@ export class Scene implements IGameScene {
 
     constructor() {
         this.renderableList = [];
-        
+        this._pauseHelper = new PauseInfo;
+
     }
+
+    private _isPaused = false;
 
     setEngine(engine: CerosEngine) {
         this._engine = engine;
@@ -64,13 +77,20 @@ export class Scene implements IGameScene {
         const assetMgr = this._engine.assetManager;
 
         // Set a default instance we will update the same resource
-        const skierAssets : SkierAnimationObject = {
+        const skierAssets: SkierAnimationObject = {
             crashed: assetMgr.getAsset('skierCrash'),
             left: assetMgr.getAsset('skierLeft'),
             right: assetMgr.getAsset('skierRight'),
             leftDown: assetMgr.getAsset('skierLeftDown'),
             rightDown: assetMgr.getAsset('skierRightDown'),
-            sking: assetMgr.getAsset('skierDown')
+            sking: assetMgr.getAsset('skierDown'),
+            jump: [
+                assetMgr.getAsset('skierJump1'),
+                assetMgr.getAsset('skierJump2'),
+                assetMgr.getAsset('skierJump3'),
+                assetMgr.getAsset('skierJump4'),
+                assetMgr.getAsset('skierJump5'),
+            ]
         };
 
         this.skier = new Skier(skierAssets.left, { width: skierAssets.left.width, height: skierAssets.left.height }, { x: 0, y: 0 });
@@ -80,11 +100,11 @@ export class Scene implements IGameScene {
         // Setup the collision system
         this.initialSetup();
 
-        requestAnimationFrame((t) => this.render(t));
+        gameAnimationResourceHandle = requestAnimationFrame((t) => this.render(t));
 
     }
 
-    
+
     onInput(e: KeyboardEvent) {
         switch (e.keyCode) {
             case KeyboardMappings.LEFT: // left
@@ -106,7 +126,7 @@ export class Scene implements IGameScene {
                     skierMapX += skierSpeed;
                     this.skier.setCurrentAnimation('right');
                     this.placeNewObstacle(skierDirection);
-                   
+
                 }
                 else {
                     skierDirection++;
@@ -126,11 +146,26 @@ export class Scene implements IGameScene {
                 this.skier.setCurrentAnimation('sking');
                 e.preventDefault();
                 break;
+
+            case KeyboardMappings.PAUSE:
+                if (this._isPaused === null) // First time
+                {
+                    this.pause();
+                    this._isPaused = !this._isPaused;
+                }
+                this._isPaused ? gameAnimationResourceHandle = requestAnimationFrame((e) => this.render(e)) : this.pause();
+                this._isPaused = !this._isPaused;
+                break;
+            case KeyboardMappings.LETTER_J:
+                // This should make the character jump
+                this.skier.setCurrentAnimation('jump')
+            break;
         }
     }
 
     render(e) {
-        
+      
+    
         const { w, h } = this.getDimension();
         this._engine.gpu.save();
         this._engine.gpu.scale(window.devicePixelRatio, window.devicePixelRatio);
@@ -143,14 +178,12 @@ export class Scene implements IGameScene {
         this.drawSkier();
         this.drawObstacles();
         this._scoreBoard.render(this._engine);
-        
-        requestAnimationFrame((e) => this.render(e));
+
+        gameAnimationResourceHandle = requestAnimationFrame((e) => this.render(e));
         this._engine.gpu.restore();
 
     }
-    update() {
 
-    }
     initialSetup() {
         // Create the obstacles to be rendered to the screen
         const { w, h } = this._engine.dimension;
@@ -309,6 +342,12 @@ export class Scene implements IGameScene {
         }
     }
 
+    pause() {
+        this._pauseHelper.display(this._engine);
+        console.log('Render Pause..');
+        cancelAnimationFrame(gameAnimationResourceHandle);
+    }
+
     drawObstacles() {
         // Get Engine for measurement size
         const { w, h } = this.getDimension();
@@ -334,7 +373,7 @@ export class Scene implements IGameScene {
 
     drawSkier() {
         const { w, h } = this.getDimension();
-     
+
         var x = (w - this.skier.resource.width) / 2;
         var y = (h - this.skier.resource.height) / 2;
 
@@ -425,7 +464,7 @@ export class Scene implements IGameScene {
             // Save the highest score and rest
             this._scoreBoard.saveScore(GAME_SCORES);
             GAME_SCORES = 0;
-            
+
         }
     }
 

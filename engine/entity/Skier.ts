@@ -17,9 +17,10 @@ export interface SkierAnimationObject {
 export class Skier extends BaseEntity implements IRenderable, ICanRendererContext {
 
     private _animationSets: SkierAnimationObject;
+    private _jumpAnimationIndex: number = 0;
 
 
-    private _currentAnimation: 'sking' | 'left' | 'leftDown' | 'right' | 'rightDown' | 'crashed';
+    private _currentAnimation: 'sking' | 'left' | 'leftDown' | 'right' | 'rightDown' | 'crashed' | 'jump';
 
     constructor(src: any, size: IRenderableSize, pos: IRenderableOffsetPosition) {
         super(src, size, pos);
@@ -42,16 +43,26 @@ export class Skier extends BaseEntity implements IRenderable, ICanRendererContex
         this._animationSets = animations;
     }
     
-    setCurrentAnimation(animation: 'sking' | 'left' | 'leftDown' | 'right' | 'rightDown' | 'crashed'){
+    setCurrentAnimation(animation: 'sking' | 'left' | 'leftDown' | 'right' | 'rightDown' | 'crashed' | 'jump'){
         this._currentAnimation = animation;
     }
 
     getCurrentAnimation(){
-        if(this._currentAnimation){
+        if(this._currentAnimation && this._currentAnimation !== 'jump'){
             return this._animationSets[this._currentAnimation];
+        }
+        else{
+            const resource =  this._animationSets.jump[this._jumpAnimationIndex++];
+            this._jumpAnimationIndex === 5 ? this.setCurrentAnimation('sking') : null; // Sets the Animation to avoid loop
+            this._jumpAnimationIndex %= this._animationSets.jump.length; // if 5 % 5 this reset back to Zero 
+            
+            return resource;
+
         }
         return null;
     }
+
+    
 
 
 

@@ -11,7 +11,7 @@ export interface IRenderable extends ICanRendererContext {
    }
 
 export interface ICanRendererContext {
-    render(engine: IGameEngine, x: number, y: number): void
+    render(engine: IGameEngine, x: number, y: number, millis?: number): void
 }
 
 export interface IRenderableSize {
@@ -27,7 +27,6 @@ export interface IRenderableOffsetPosition {
 
 export interface IGameScene {
     render(e): void;
-    update(): void;
     initialSetup(): void;
     title: string;
     
@@ -38,7 +37,6 @@ export interface IGameEngine {
     assetManager: IAssetManager;
     audioManager?: any;
     render(): void;
-    update(): void;
 
 }
 
