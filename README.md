@@ -94,5 +94,8 @@ We are looking forward to see what you come up with!
 * Run npm i to install
 * Run npm run dev after installation of Node Modules
 
+DEMO url
+http://83.136.248.181/rhino-ski/
+
 
 
