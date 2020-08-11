@@ -89,5 +89,10 @@ We are looking forward to see what you come up with!
 * Jump animation speed is too fast
 * Collision detection isn't accurate sometimes 
 
+## How to run
+
+* Run npm i to install
+* Run npm run dev after installation of Node Modules
+
 
 
