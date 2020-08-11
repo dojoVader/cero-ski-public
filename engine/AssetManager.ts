@@ -34,10 +34,10 @@ export class AssetManager implements IAssetManager {
         'skierJump5': 'img/skier_jump_5.png',
         'rhinoDefault': 'img/rhino_default.png',
         'rhinoLift': 'img/rhino_lift.png',
-        'rhinoLiftEat1': 'img/rhino_life_eat_1.png',
-        'rhinoLiftEat2': 'img/rhino_life_eat_2.png',
-        'rhinoLiftEat3': 'img/rhino_life_eat_3.png',
-        'rhinoLiftEat4': 'img/rhino_life_eat_4.png',
+        'rhinoLiftEat1': 'img/rhino_lift_eat_1.png',
+        'rhinoLiftEat2': 'img/rhino_lift_eat_2.png',
+        'rhinoLiftEat3': 'img/rhino_lift_eat_3.png',
+        'rhinoLiftEat4': 'img/rhino_lift_eat_4.png',
         'rhinoLiftEatMouthOpen': 'img/rhino_lift_mouth_open.png',
         'rhinoRunLeft':'img/rhino_run_left.png',
         
@@ -62,8 +62,8 @@ export class AssetManager implements IAssetManager {
             let resourceImage = new Image();
 
             resourceImage.onload = () => {
-                resourceImage.width /= 2;
-                resourceImage.height /= 2;
+                // resourceImage.width /= 2;
+                // resourceImage.height /= 2;
                 this.setAsset(assetName, resourceImage);
                 this._trackingManager.passed++;
                 if (this.isDone()) {

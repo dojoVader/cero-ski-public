@@ -7,6 +7,7 @@ export class JumpRamp extends BaseEntity implements IRenderable, ICanRendererCon
     constructor(src: any, size: IRenderableSize, pos: IRenderableOffsetPosition) {
         super(src, size, pos);
     }
+    
   
 
 }
