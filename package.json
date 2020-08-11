@@ -4,7 +4,10 @@
     "description": "",
     "main": "web.js",
     "scripts": {
-        "start": "node web.js"
+        "start": "node web.js",
+        "dev": " parcel index.html",
+        "build": "parcel build app.ts --out-dir dist/",
+        "watch": "parcel watch index.html"
     },
     "author": "dan.wash@ceros.com",
     "license": "",
@@ -13,5 +16,11 @@
     },
     "dependencies": {
         "http-server": "^0.10.0"
+    },
+    "devDependencies": {
+        "@types/jquery": "^3.5.1",
+        "@types/lodash": "^4.14.159",
+        "parcel-bundler": "^1.12.4",
+        "typescript": "^3.9.7"
     }
 }

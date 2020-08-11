@@ -1,19 +1,20 @@
-$(document).ready(function() {
+$(document).ready(function () {
 
+    // Refactored
     var assets = {
-        'skierCrash' : 'img/skier_crash.png',
-        'skierLeft' : 'img/skier_left.png',
-        'skierLeftDown' : 'img/skier_left_down.png',
-        'skierDown' : 'img/skier_down.png',
-        'skierRightDown' : 'img/skier_right_down.png',
-        'skierRight' : 'img/skier_right.png',
-        'tree' : 'img/tree_1.png',
-        'treeCluster' : 'img/tree_cluster.png',
-        'rock1' : 'img/rock_1.png',
-        'rock2' : 'img/rock_2.png'
+        'skierCrash': 'img/skier_crash.png',
+        'skierLeft': 'img/skier_left.png',
+        'skierLeftDown': 'img/skier_left_down.png',
+        'skierDown': 'img/skier_down.png',
+        'skierRightDown': 'img/skier_right_down.png',
+        'skierRight': 'img/skier_right.png',
+        'tree': 'img/tree_1.png',
+        'treeCluster': 'img/tree_cluster.png',
+        'rock1': 'img/rock_1.png',
+        'rock2': 'img/rock_2.png'
     };
     var loadedAssets = {};
-
+    // Refactored
     var obstacleTypes = [
         'tree',
         'treeCluster',
@@ -39,13 +40,13 @@ $(document).ready(function() {
     var skierMapX = 0;
     var skierMapY = 0;
     var skierSpeed = 8;
-
-    var clearCanvas = function() {
+    // Refactored
+    var clearCanvas = function () {
         ctx.clearRect(0, 0, gameWidth, gameHeight);
     };
-
-    var moveSkier = function() {
-        switch(skierDirection) {
+    // Refactored
+    var moveSkier = function () {
+        switch (skierDirection) {
             case 2:
                 skierMapX -= Math.round(skierSpeed / 1.4142);
                 skierMapY += Math.round(skierSpeed / 1.4142);
@@ -65,10 +66,10 @@ $(document).ready(function() {
                 break;
         }
     };
-
-    var getSkierAsset = function() {
+    // Refactored
+    var getSkierAsset = function () {
         var skierAssetName;
-        switch(skierDirection) {
+        switch (skierDirection) {
             case 0:
                 skierAssetName = 'skierCrash';
                 break;
@@ -91,8 +92,8 @@ $(document).ready(function() {
 
         return skierAssetName;
     };
-
-    var drawSkier = function() {
+    // Refactored
+    var drawSkier = function () {
         var skierAssetName = getSkierAsset();
         var skierImage = loadedAssets[skierAssetName];
         var x = (gameWidth - skierImage.width) / 2;
@@ -101,15 +102,16 @@ $(document).ready(function() {
         ctx.drawImage(skierImage, x, y, skierImage.width, skierImage.height);
     };
 
-    var drawObstacles = function() {
+    //Refactored
+    var drawObstacles = function () {
         var newObstacles = [];
 
-        _.each(obstacles, function(obstacle) {
+        _.each(obstacles, function (obstacle) {
             var obstacleImage = loadedAssets[obstacle.type];
             var x = obstacle.x - skierMapX - obstacleImage.width / 2;
             var y = obstacle.y - skierMapY - obstacleImage.height / 2;
 
-            if(x < -100 || x > gameWidth + 50 || y < -100 || y > gameHeight + 50) {
+            if (x < -100 || x > gameWidth + 50 || y < -100 || y > gameHeight + 50) {
                 return;
             }
 
@@ -121,7 +123,8 @@ $(document).ready(function() {
         obstacles = newObstacles;
     };
 
-    var placeInitialObstacles = function() {
+    //Refactored
+    var placeInitialObstacles = function () {
         var numberObstacles = Math.ceil(_.random(5, 7) * (gameWidth / 800) * (gameHeight / 500));
 
         var minX = -50;
@@ -129,19 +132,21 @@ $(document).ready(function() {
         var minY = gameHeight / 2 + 100;
         var maxY = gameHeight + 50;
 
-        for(var i = 0; i < numberObstacles; i++) {
+        for (var i = 0; i < numberObstacles; i++) {
             placeRandomObstacle(minX, maxX, minY, maxY);
         }
-
-        obstacles = _.sortBy(obstacles, function(obstacle) {
+        // Extra loop removed
+        obstacles = _.sortBy(obstacles, function (obstacle) {
             var obstacleImage = loadedAssets[obstacle.type];
             return obstacle.y + obstacleImage.height;
         });
     };
 
-    var placeNewObstacle = function(direction) {
+    // Places items at different corners of the scrren after the initial setup
+    // Refactored
+    var placeNewObstacle = function (direction) {
         var shouldPlaceObstacle = _.random(1, 8);
-        if(shouldPlaceObstacle !== 8) {
+        if (shouldPlaceObstacle !== 8) {
             return;
         }
 
@@ -150,7 +155,7 @@ $(document).ready(function() {
         var topEdge = skierMapY;
         var bottomEdge = skierMapY + gameHeight;
 
-        switch(direction) {
+        switch (direction) {
             case 1: // left
                 placeRandomObstacle(leftEdge - 50, leftEdge, topEdge, bottomEdge);
                 break;
@@ -174,27 +179,29 @@ $(document).ready(function() {
         }
     };
 
-    var placeRandomObstacle = function(minX, maxX, minY, maxY) {
+    //Refactored
+    var placeRandomObstacle = function (minX, maxX, minY, maxY) {
         var obstacleIndex = _.random(0, obstacleTypes.length - 1);
 
         var position = calculateOpenPosition(minX, maxX, minY, maxY);
 
         obstacles.push({
-            type : obstacleTypes[obstacleIndex],
-            x : position.x,
-            y : position.y
+            type: obstacleTypes[obstacleIndex],
+            x: position.x,
+            y: position.y
         })
     };
 
-    var calculateOpenPosition = function(minX, maxX, minY, maxY) {
+    //Refactored
+    var calculateOpenPosition = function (minX, maxX, minY, maxY) {
         var x = _.random(minX, maxX);
         var y = _.random(minY, maxY);
 
-        var foundCollision = _.find(obstacles, function(obstacle) {
+        var foundCollision = _.find(obstacles, function (obstacle) {
             return x > (obstacle.x - 50) && x < (obstacle.x + 50) && y > (obstacle.y - 50) && y < (obstacle.y + 50);
         });
 
-        if(foundCollision) {
+        if (foundCollision) {
             return calculateOpenPosition(minX, maxX, minY, maxY);
         }
         else {
@@ -205,7 +212,8 @@ $(document).ready(function() {
         }
     };
 
-    var checkIfSkierHitObstacle = function() {
+    // Refactored
+    var checkIfSkierHitObstacle = function () {
         var skierAssetName = getSkierAsset();
         var skierImage = loadedAssets[skierAssetName];
         var skierRect = {
@@ -215,7 +223,7 @@ $(document).ready(function() {
             bottom: skierMapY + skierImage.height + gameHeight / 2
         };
 
-        var collision = _.find(obstacles, function(obstacle) {
+        var collision = _.find(obstacles, function (obstacle) {
             var obstacleImage = loadedAssets[obstacle.type];
             var obstacleRect = {
                 left: obstacle.x,
@@ -227,19 +235,19 @@ $(document).ready(function() {
             return intersectRect(skierRect, obstacleRect);
         });
 
-        if(collision) {
+        if (collision) {
             skierDirection = 0;
         }
     };
-
-    var intersectRect = function(r1, r2) {
+    // Refactored
+    var intersectRect = function (r1, r2) {
         return !(r2.left > r1.right ||
             r2.right < r1.left ||
             r2.top > r1.bottom ||
             r2.bottom < r1.top);
     };
-
-    var gameLoop = function() {
+    // Refactored => Render method
+    var gameLoop = function () {
 
         ctx.save();
 
@@ -252,23 +260,24 @@ $(document).ready(function() {
 
         checkIfSkierHitObstacle();
 
-        drawSkier();
+        drawSkier(); // Done
 
-        drawObstacles();
+        drawObstacles(); //Done
 
-        ctx.restore();
+        ctx.restore(); // Done
 
-        requestAnimationFrame(gameLoop);
+        requestAnimationFrame(gameLoop);  // Done
     };
 
-    var loadAssets = function() {
+    //Refactored
+    var loadAssets = function () {
         var assetPromises = [];
 
-        _.each(assets, function(asset, assetName) {
+        _.each(assets, function (asset, assetName) {
             var assetImage = new Image();
             var assetDeferred = new $.Deferred();
 
-            assetImage.onload = function() {
+            assetImage.onload = function () {
                 assetImage.width /= 2;
                 assetImage.height /= 2;
 
@@ -283,11 +292,12 @@ $(document).ready(function() {
         return $.when.apply($, assetPromises);
     };
 
-    var setupKeyhandler = function() {
-        $(window).keydown(function(event) {
-            switch(event.which) {
+    //Refactored
+    var setupKeyhandler = function () {
+        $(window).keydown(function (event) {
+            switch (event.which) {
                 case 37: // left
-                    if(skierDirection === 1) {
+                    if (skierDirection === 1) {
                         skierMapX -= skierSpeed;
                         placeNewObstacle(skierDirection);
                     }
@@ -297,7 +307,7 @@ $(document).ready(function() {
                     event.preventDefault();
                     break;
                 case 39: // right
-                    if(skierDirection === 5) {
+                    if (skierDirection === 5) {
                         skierMapX += skierSpeed;
                         placeNewObstacle(skierDirection);
                     }
@@ -307,7 +317,7 @@ $(document).ready(function() {
                     event.preventDefault();
                     break;
                 case 38: // up
-                    if(skierDirection === 1 || skierDirection === 5) {
+                    if (skierDirection === 1 || skierDirection === 5) {
                         skierMapY -= skierSpeed;
                         placeNewObstacle(6);
                     }
@@ -321,10 +331,10 @@ $(document).ready(function() {
         });
     };
 
-    var initGame = function() {
+    var initGame = function () {
         setupKeyhandler();
-        loadAssets().then(function() {
-            placeInitialObstacles();
+        loadAssets().then(function () {
+            placeInitialObstacles(); // Set the items to be drawn
 
             requestAnimationFrame(gameLoop);
         });

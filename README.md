@@ -49,3 +49,50 @@ And don't think you have to stop there. If you're having fun with this and have 
 you want and show us what you can do! 
 
 We are looking forward to see what you come up with!
+
+
+## COMMENT
+
+#### What was done ? 
+
+* I re-structured the code to be re-written in TypeScript so that it can be easy to maintain and get alot of static typing
+
+* Fix the bug issue related with the left direction, now when it crashes it still works
+
+* I somewhat implemented the Jump feature that happen when you press J
+
+* I also implemented the Score and it persists across browser
+
+* I switched to Parcel as the bundler for the project because it is straight forward and I can use TypeScript
+
+* I implemented the Pause functionality and rendered a UI and it resumes when you press P 
+
+#### What was not done ? 
+
+* Testing Sadly I did not have enough time to do this and wasn't sure how to test canvas operation other than the DOM and the data of the game
+
+* Although Jump was done, the rendering is done so fast, I didn't have enough time to research how to limit only the Jump animation speed
+
+* I was able to have the Rhino appear but working on making it move towards the Skier, I might finish it but wanted to submit this first 
+
+* Game over screen I spent too much time trying to fix Jump animation
+
+#### Featured Added
+
+* HighScore
+* GameSpeed increases
+* Pause functionality
+* Jump Ramp added
+
+#### Bugs
+
+* Jump animation speed is too fast
+* Collision detection isn't accurate sometimes 
+
+## How to run
+
+* Run npm i to install
+* Run npm run dev after installation of Node Modules
+
+
+
