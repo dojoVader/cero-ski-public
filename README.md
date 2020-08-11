@@ -90,7 +90,7 @@ We are looking forward to see what you come up with!
 * Collision detection isn't accurate sometimes 
 
 ## How to run
-
+* Install parcel Globally with this npm install -g parcel-bundler
 * Run npm i to install
 * Run npm run dev after installation of Node Modules
 
