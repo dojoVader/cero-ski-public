@@ -5,6 +5,7 @@ import { Skier } from "../Entities/Skier";
 import { ObstacleManager } from "../Entities/Obstacles/ObstacleManager";
 import { Rect } from './Utils';
 import { ScoreBoard, ScoreBoardPosition } from "../Entities/Scoreboard";
+import { PauseInfo } from "../Entities/PauseInfo";
 
 export class Game {
     gameWindow: Rect = null;
@@ -13,6 +14,10 @@ export class Game {
     skier: Skier;
     obstacleManager: ObstacleManager;
     scoreboard: ScoreBoard;
+    pauseUI: PauseInfo;
+    isPaused: boolean = null;
+
+    private animationID: number;
 
     constructor() {
         this.assetManager = new AssetManager();
@@ -20,6 +25,7 @@ export class Game {
         this.skier = new Skier(0, 0);
         this.obstacleManager = new ObstacleManager();
         this.scoreboard = new ScoreBoard(ScoreBoardPosition.TOP_LEFT);
+        this.pauseUI = new PauseInfo;
 
         document.addEventListener('keydown', this.handleKeyDown.bind(this));
     }
@@ -32,13 +38,13 @@ export class Game {
         await this.assetManager.loadAssets(Constants.ASSETS);
     }
 
-    run() {
+    run(e?: number) {
         this.canvas.clearCanvas();
 
         this.updateGameWindow();
         this.drawGameWindow();
 
-        requestAnimationFrame(this.run.bind(this));
+        this.animationID = requestAnimationFrame(this.run.bind(this));
     }
 
     updateGameWindow() {
@@ -67,9 +73,13 @@ export class Game {
         this.gameWindow = new Rect(left, top, left + Constants.GAME_WIDTH, top + Constants.GAME_HEIGHT);
         this.scoreboard.render(this.canvas);
     }
+    pause(shouldReset?: boolean) {
+        this.pauseUI.display(this.canvas, shouldReset ? 'Game Over!, Press R to reset' : 'Pause..');
+        cancelAnimationFrame(this.animationID);
+    }
 
     handleKeyDown(event: KeyboardEvent) {
-        switch(event.which) {
+        switch (event.which) {
             case Constants.KEYS.LEFT:
                 this.skier.turnLeft();
                 event.preventDefault();
@@ -86,6 +96,17 @@ export class Game {
                 this.skier.turnDown();
                 event.preventDefault();
                 break;
+
+            case Constants.KEYS.PAUSE:
+                if (this.isPaused === null) {
+                    this.isPaused = true;
+                    this.pauseUI.display(this.canvas, 'Paused..');
+                    cancelAnimationFrame(this.animationID);
+                }
+                this.isPaused ? this.animationID = requestAnimationFrame((e) => this.run(e)) : this.pause();
+                this.isPaused = !this.isPaused;
+                break;
+
         }
     }
 }
