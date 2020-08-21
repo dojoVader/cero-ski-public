@@ -1,10 +1,13 @@
+import { AssetManager } from "../Core/AssetManager";
+import { Canvas } from "../Core/Canvas";
+
 export class Entity {
     x = 0;
     y = 0;
 
     assetName = '';
 
-    constructor(x, y) {
+    constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
     }
@@ -20,7 +23,7 @@ export class Entity {
         };
     }
 
-    draw(canvas, assetManager) {
+    draw(canvas: Canvas, assetManager: AssetManager) {
         const asset = assetManager.getAsset(this.assetName);
         const drawX = this.x - asset.width / 2;
         const drawY = this.y - asset.height / 2;

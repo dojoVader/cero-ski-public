@@ -7,9 +7,9 @@ export class Canvas {
         x: 0,
         y: 0
     };
-    ctx = null;
+    ctx: CanvasRenderingContext2D = null;
 
-    constructor(width, height) {
+    constructor(width: number, height: number) {
         this.width = width;
         this.height = height;
 
@@ -34,12 +34,12 @@ export class Canvas {
         this.ctx.clearRect(this.x, this.y, this.width, this.height);
     }
 
-    setDrawOffset(x, y) {
+    setDrawOffset(x: number, y: number) {
         this.drawOffset.x = x;
         this.drawOffset.y = y;
     }
 
-    drawImage(image, x, y, width, height) {
+    drawImage(image: HTMLImageElement, x: number, y: number, width: number, height: number) {
         x -= this.drawOffset.x;
         y -= this.drawOffset.y;
 

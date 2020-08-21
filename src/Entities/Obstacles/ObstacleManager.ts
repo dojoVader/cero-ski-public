@@ -1,5 +1,9 @@
 import * as Constants from '../../Constants';
-import { randomInt } from '../../Core/Utils';
+import { AssetManager } from '../../Core/AssetManager';
+import { Canvas } from '../../Core/Canvas';
+import { randomInt, Rect } from '../../Core/Utils';
+import { ICanvasOffset } from '../../game.interface';
+import { Entity } from '../Entity';
 import { Obstacle } from "./Obstacle";
 
 const DISTANCE_BETWEEN_OBSTACLES = 50;
@@ -8,7 +12,7 @@ const STARTING_OBSTACLE_REDUCER = 300;
 const NEW_OBSTACLE_CHANCE = 8;
 
 export class ObstacleManager {
-    obstacles = [];
+    obstacles: Entity[] = [];
 
     constructor() {
     }
@@ -17,7 +21,7 @@ export class ObstacleManager {
         return this.obstacles;
     }
 
-    drawObstacles(canvas, assetManager) {
+    drawObstacles(canvas: Canvas, assetManager: AssetManager) {
         this.obstacles.forEach((obstacle) => {
             obstacle.draw(canvas, assetManager);
         });
@@ -26,7 +30,7 @@ export class ObstacleManager {
     placeInitialObstacles() {
         const numberObstacles = Math.ceil((Constants.GAME_WIDTH / STARTING_OBSTACLE_REDUCER) * (Constants.GAME_HEIGHT / STARTING_OBSTACLE_REDUCER));
 
-        const minX = -Constants.GAME_WIDTH / 2;
+        const minX = - Constants.GAME_WIDTH / 2;
         const maxX = Constants.GAME_WIDTH / 2;
         const minY = STARTING_OBSTACLE_GAP;
         const maxY = Constants.GAME_HEIGHT / 2;
@@ -40,7 +44,7 @@ export class ObstacleManager {
         });
     }
 
-    placeNewObstacle(gameWindow, previousGameWindow) {
+    placeNewObstacle(gameWindow: Rect, previousGameWindow: Rect) {
         const shouldPlaceObstacle = randomInt(1, NEW_OBSTACLE_CHANCE);
         if(shouldPlaceObstacle !== NEW_OBSTACLE_CHANCE) {
             return;
@@ -61,30 +65,30 @@ export class ObstacleManager {
         }
     };
 
-    placeObstacleLeft(gameWindow) {
+    placeObstacleLeft(gameWindow: Rect) {
         this.placeRandomObstacle(gameWindow.left, gameWindow.left, gameWindow.top, gameWindow.bottom);
     }
 
-    placeObstacleRight(gameWindow) {
+    placeObstacleRight(gameWindow: Rect) {
         this.placeRandomObstacle(gameWindow.right, gameWindow.right, gameWindow.top, gameWindow.bottom);
     }
 
-    placeObstacleTop(gameWindow) {
+    placeObstacleTop(gameWindow: Rect) {
         this.placeRandomObstacle(gameWindow.left, gameWindow.right, gameWindow.top, gameWindow.top);
     }
 
-    placeObstacleBottom(gameWindow) {
+    placeObstacleBottom(gameWindow: Rect) {
         this.placeRandomObstacle(gameWindow.left, gameWindow.right, gameWindow.bottom, gameWindow.bottom);
     }
 
-    placeRandomObstacle(minX, maxX, minY, maxY) {
+    placeRandomObstacle(minX: number, maxX: number, minY: number, maxY: number) {
         const position = this.calculateOpenPosition(minX, maxX, minY, maxY);
         const newObstacle = new Obstacle(position.x, position.y);
 
         this.obstacles.push(newObstacle);
     }
 
-    calculateOpenPosition(minX, maxX, minY, maxY) {
+    calculateOpenPosition(minX: number, maxX: number, minY: number, maxY: number): ICanvasOffset {
         const x = randomInt(minX, maxX);
         const y = randomInt(minY, maxY);
 

@@ -6,7 +6,11 @@ import { ObstacleManager } from "../Entities/Obstacles/ObstacleManager";
 import { Rect } from './Utils';
 
 export class Game {
-    gameWindow = null;
+    gameWindow: Rect = null;
+    assetManager: AssetManager;
+    canvas: Canvas;
+    skier: Skier;
+    obstacleManager: ObstacleManager;
 
     constructor() {
         this.assetManager = new AssetManager();
@@ -60,7 +64,7 @@ export class Game {
         this.gameWindow = new Rect(left, top, left + Constants.GAME_WIDTH, top + Constants.GAME_HEIGHT);
     }
 
-    handleKeyDown(event) {
+    handleKeyDown(event: KeyboardEvent) {
         switch(event.which) {
             case Constants.KEYS.LEFT:
                 this.skier.turnLeft();

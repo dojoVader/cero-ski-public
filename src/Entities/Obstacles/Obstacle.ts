@@ -7,10 +7,11 @@ const assetTypes = [
     Constants.TREE_CLUSTER,
     Constants.ROCK1,
     Constants.ROCK2
+    
 ];
 
 export class Obstacle extends Entity {
-    constructor(x, y) {
+    constructor(x: number, y: number) {
         super(x, y);
 
         const assetIdx = randomInt(0, assetTypes.length - 1);

@@ -5,6 +5,9 @@ require("@babel/register");
 // Webpack Configuration
 const config = {
     devtool: 'inline-source-map',
+    devServer: {
+        hot: true,
+    },
 
     entry: ['babel-polyfill', './src/index.ts'],
 
@@ -35,8 +38,8 @@ const config = {
             }
         ]
     },
-    resolve:{
-        extensions: [ '.tsx', '.ts', '.js' ]
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js']
     },
     plugins: [
         new htmlWebpackPlugin({

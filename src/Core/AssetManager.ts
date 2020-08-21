@@ -1,11 +1,13 @@
 export class AssetManager {
-    loadedAssets = [];
+    
+    
+    private loadedAssets: {[key: string]: HTMLImageElement} = {};
 
     constructor() {
     }
 
-    async loadAssets(assets) {
-        const assetPromises = [];
+    async loadAssets(assets: {[key: string]: string}) {
+        const assetPromises: Promise<void>[] = [];
 
         for (const [assetName, assetUrl] of Object.entries(assets)) {
             const assetPromise = this.loadSingleAsset(assetUrl, assetName);
@@ -15,7 +17,7 @@ export class AssetManager {
         await Promise.all(assetPromises);
     }
 
-    loadSingleAsset(assetUrl, assetName) {
+    loadSingleAsset(assetUrl: string, assetName: string): Promise<void> {
         return new Promise((resolve) => {
             const assetImage = new Image();
             assetImage.onload = () => {
@@ -29,7 +31,7 @@ export class AssetManager {
         });
     }
 
-    getAsset(assetName) {
+    getAsset(assetName: string): HTMLImageElement {
         return this.loadedAssets[assetName];
     }
 }

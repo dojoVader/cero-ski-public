@@ -4,7 +4,7 @@ export function randomInt(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function intersectTwoRects(rect1, rect2) {
+export function intersectTwoRects(rect1: Rect, rect2: Rect) {
     return !(rect2.left > rect1.right ||
         rect2.right < rect1.left ||
         rect2.top > rect1.bottom ||
@@ -17,7 +17,7 @@ export class Rect {
     right = 0;
     bottom = 0;
 
-    constructor(left, top, right, bottom) {
+    constructor(left: number, top: number, right: number, bottom: number) {
         this.left = left;
         this.top = top;
         this.right = right;

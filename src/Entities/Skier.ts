@@ -1,6 +1,8 @@
 import * as Constants from "../Constants";
 import { Entity } from "./Entity";
 import { intersectTwoRects, Rect } from "../Core/Utils";
+import { ObstacleManager } from "./Obstacles/ObstacleManager";
+import { AssetManager } from "../Core/AssetManager";
 
 export class Skier extends Entity {
     assetName = Constants.SKIER_DOWN;
@@ -8,11 +10,11 @@ export class Skier extends Entity {
     direction = Constants.SKIER_DIRECTIONS.DOWN;
     speed = Constants.SKIER_STARTING_SPEED;
 
-    constructor(x, y) {
+    constructor(x: number, y: number) {
         super(x, y);
     }
 
-    setDirection(direction) {
+    setDirection(direction: number) {
         this.direction = direction;
         this.updateAsset();
     }
@@ -22,7 +24,7 @@ export class Skier extends Entity {
     }
 
     move() {
-        switch(this.direction) {
+        switch (this.direction) {
             case Constants.SKIER_DIRECTIONS.LEFT_DOWN:
                 this.moveSkierLeftDown();
                 break;
@@ -62,7 +64,7 @@ export class Skier extends Entity {
     }
 
     turnLeft() {
-        if(this.direction === Constants.SKIER_DIRECTIONS.LEFT) {
+        if (this.direction === Constants.SKIER_DIRECTIONS.LEFT) {
             this.moveSkierLeft();
         }
         else {
@@ -71,7 +73,7 @@ export class Skier extends Entity {
     }
 
     turnRight() {
-        if(this.direction === Constants.SKIER_DIRECTIONS.RIGHT) {
+        if (this.direction === Constants.SKIER_DIRECTIONS.RIGHT) {
             this.moveSkierRight();
         }
         else {
@@ -80,7 +82,7 @@ export class Skier extends Entity {
     }
 
     turnUp() {
-        if(this.direction === Constants.SKIER_DIRECTIONS.LEFT || this.direction === Constants.SKIER_DIRECTIONS.RIGHT) {
+        if (this.direction === Constants.SKIER_DIRECTIONS.LEFT || this.direction === Constants.SKIER_DIRECTIONS.RIGHT) {
             this.moveSkierUp();
         }
     }
@@ -89,7 +91,7 @@ export class Skier extends Entity {
         this.setDirection(Constants.SKIER_DIRECTIONS.DOWN);
     }
 
-    checkIfSkierHitObstacle(obstacleManager, assetManager) {
+    checkIfSkierHitObstacle(obstacleManager: ObstacleManager, assetManager: AssetManager) {
         const asset = assetManager.getAsset(this.assetName);
         const skierBounds = new Rect(
             this.x - asset.width / 2,
@@ -111,7 +113,7 @@ export class Skier extends Entity {
             return intersectTwoRects(skierBounds, obstacleBounds);
         });
 
-        if(collision) {
+        if (collision) {
             this.setDirection(Constants.SKIER_DIRECTIONS.CRASH);
         }
     };
