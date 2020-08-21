@@ -1,5 +1,5 @@
 import '../css/game.css';
-import { Game } from './Core/Game.js';
+import { Game } from './Core/Game';
 
 document.addEventListener("DOMContentLoaded",() => {
     const skiGame = new Game();
