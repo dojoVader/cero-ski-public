@@ -43,7 +43,8 @@ const config = {
     },
     plugins: [
         new htmlWebpackPlugin({
-            title: 'Ceros Ski'
+            title: 'Ceros Ski',
+            template: 'src/index.html'
         })
     ],
 };

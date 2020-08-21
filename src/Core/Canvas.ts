@@ -23,10 +23,11 @@ export class Canvas {
         canvas.height = this.height * window.devicePixelRatio;
         canvas.style.width = this.width + 'px';
         canvas.style.height = this.height + 'px';
+        
 
         this.ctx = canvas.getContext("2d");
         this.ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-
+        this.ctx.font = '30px VT323';
         document.body.appendChild(canvas);
     }
 

@@ -4,6 +4,7 @@ import { Canvas } from './Canvas';
 import { Skier } from "../Entities/Skier";
 import { ObstacleManager } from "../Entities/Obstacles/ObstacleManager";
 import { Rect } from './Utils';
+import { ScoreBoard, ScoreBoardPosition } from "../Entities/Scoreboard";
 
 export class Game {
     gameWindow: Rect = null;
@@ -11,12 +12,14 @@ export class Game {
     canvas: Canvas;
     skier: Skier;
     obstacleManager: ObstacleManager;
+    scoreboard: ScoreBoard;
 
     constructor() {
         this.assetManager = new AssetManager();
         this.canvas = new Canvas(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
         this.skier = new Skier(0, 0);
         this.obstacleManager = new ObstacleManager();
+        this.scoreboard = new ScoreBoard(ScoreBoardPosition.TOP_LEFT);
 
         document.addEventListener('keydown', this.handleKeyDown.bind(this));
     }
@@ -62,6 +65,7 @@ export class Game {
         const top = skierPosition.y - (Constants.GAME_HEIGHT / 2);
 
         this.gameWindow = new Rect(left, top, left + Constants.GAME_WIDTH, top + Constants.GAME_HEIGHT);
+        this.scoreboard.render(this.canvas);
     }
 
     handleKeyDown(event: KeyboardEvent) {
