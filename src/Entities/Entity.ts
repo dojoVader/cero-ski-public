@@ -5,6 +5,18 @@ export class Entity {
     x = 0;
     y = 0;
 
+    millis: number; // This is the rAF animation time elapsed for animation throttling
+
+    private _id: string = '';
+
+    public get id() {
+        return this._id;
+    }
+
+    setId(id){
+        this._id = id;
+    }
+
     assetName = '';
 
     constructor(x: number, y: number) {

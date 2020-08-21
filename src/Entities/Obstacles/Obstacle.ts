@@ -10,27 +10,24 @@ const assetTypes = [
     Constants.JUMPING_RAMP
 ];
 
+// maps to assetTypes
 const assetEntityId = [
     'tree',
     'treeCluster',
     'rock',
-    'rock2',
+    'rock',
     'jumping_ramp'
 ]
 
 export class Obstacle extends Entity {
 
-    private _id: string;
-
-    public get id() {
-        return this._id;
-    }
+   
 
     constructor(x: number, y: number) {
         super(x, y);
 
         const assetIdx = randomInt(0, assetTypes.length - 1);
         this.assetName = assetTypes[assetIdx];
-        this._id = assetEntityId[assetIdx];
+        this.setId(assetEntityId[assetIdx]);
     }
 }

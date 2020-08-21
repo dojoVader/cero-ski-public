@@ -7,6 +7,9 @@ import { Rect } from './Utils';
 import { ScoreBoard, ScoreBoardPosition } from "../Entities/Scoreboard";
 import { PauseInfo } from "../Entities/PauseInfo";
 
+
+
+
 export class Game {
     gameWindow: Rect = null;
     assetManager: AssetManager;
@@ -16,6 +19,8 @@ export class Game {
     scoreboard: ScoreBoard;
     pauseUI: PauseInfo;
     isPaused: boolean = null;
+
+
 
     private animationID: number;
 
@@ -40,7 +45,7 @@ export class Game {
 
     run(e?: number) {
         this.canvas.clearCanvas();
-
+        this.skier.millis = e;
         this.updateGameWindow();
         this.drawGameWindow();
 
@@ -106,6 +111,12 @@ export class Game {
                 this.isPaused ? this.animationID = requestAnimationFrame((e) => this.run(e)) : this.pause();
                 this.isPaused = !this.isPaused;
                 break;
+
+            case Constants.KEYS.J:
+                // Implement the jump functionality
+                this.skier.jump();
+                event.preventDefault();
+            break;
 
         }
     }

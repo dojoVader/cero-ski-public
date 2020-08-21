@@ -17,7 +17,7 @@ export class ObstacleManager {
     constructor() {
     }
 
-    getObstacles() {
+    getObstacles(): Entity[] {
         return this.obstacles;
     }
 
