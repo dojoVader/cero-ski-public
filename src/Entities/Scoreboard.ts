@@ -1,7 +1,7 @@
 import { Canvas } from "../Core/Canvas";
 
 const X_OFFSET = 20;
-const Y_OFFSET = 40;
+const Y_OFFSET = 70;
 
 
 export enum ScoreBoardPosition {
@@ -68,7 +68,7 @@ export class ScoreBoard {
             case ScoreBoardPosition.TOP_LEFT:
                 canvas.ctx.save();
                 canvas.ctx.fillText(`Highest Score: ${this.getHighestScore()}`, X_OFFSET, Y_OFFSET)
-                canvas.ctx.fillText(`Current Score: ${this._current_score}`, X_OFFSET, Y_OFFSET * 2);
+                canvas.ctx.fillText(`Current Score: ${this._current_score}`, X_OFFSET, Y_OFFSET * 1.5);
                 canvas.ctx.restore();
                 break;
 
