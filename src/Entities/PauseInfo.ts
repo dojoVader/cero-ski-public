@@ -13,7 +13,8 @@ export class PauseInfo {
         // Render the text
         canvas.ctx.save();
         canvas.ctx.fillStyle = 'white';
-        canvas.ctx.fillText(message, (canvas.width / 2) - 75, (canvas.height / 2));
+        const textWidth = canvas.ctx.measureText(message);
+        canvas.ctx.fillText(message, (canvas.width / 2) - (textWidth.width / 2), (canvas.height / 2), textWidth.width);
         canvas.ctx.restore();
     }
 }

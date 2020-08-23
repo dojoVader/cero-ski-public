@@ -1,3 +1,5 @@
+import { Entity } from "../Entities/Entity";
+
 export function randomInt(min: number, max: number) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -9,6 +11,10 @@ export function intersectTwoRects(rect1: Rect, rect2: Rect) {
         rect2.right < rect1.left ||
         rect2.top > rect1.bottom ||
         rect2.bottom < rect1.top);
+}
+
+export function distance(rect1: Entity, rect2: Entity) {
+    return Math.hypot(rect2.x - rect1.x, rect2.y - rect1.y);
 }
 
 export class Rect {

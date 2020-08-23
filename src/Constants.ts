@@ -31,7 +31,7 @@ export const RHINO_MOVEMENT2 = 'rhino_move2';
 
 export const SKIER_STARTING_SPEED = 10;
 export const SKIER_DIAGONAL_SPEED_REDUCER = 1.4142;
-export const SKIER_JUMP_SPEED = 2;
+export const RHINO_SPEED = 6;
 
 
 export const ASSETS = {
@@ -76,7 +76,11 @@ export const SKIER_DIRECTIONS = {
 export const RHINO_DIRECTIONS = {
     LEFT: 1,
     LEFT_NEXT_LEG: 2,
-    EAT: 3
+    EAT: 3,
+    DOWN: 4,
+    RIGHT: 5,
+    STOP: 7,
+    CAUGHT_SKIER: 8
 }
 
 export const SKIER_DIRECTION_ASSET: SkierDirection = {
@@ -90,13 +94,12 @@ export const SKIER_DIRECTION_ASSET: SkierDirection = {
 };
 
 export const RHINO_DIRECTION_ASSETS = {
-    [RHINO_DIRECTIONS.LEFT]: [RHINO_MOVEMENT, RHINO_MOVEMENT2],
+    [RHINO_DIRECTIONS.LEFT]: RHINO_MOVEMENT,
+    [RHINO_DIRECTIONS.LEFT_NEXT_LEG]: RHINO_MOVEMENT2,
     [RHINO_DIRECTIONS.EAT]: [RHINO_SEQUENCE1, RHINO_SEQUENCE2, RHINO_SEQUENCE3, RHINO_SEQUENCE4, RHINO_SEQUENCE5, RHINO_SEQUENCE6]
 }
 
-export const RHINO_EAT_ASSET = {
 
-}
 
 export const KEYS = {
     LEFT: 37,

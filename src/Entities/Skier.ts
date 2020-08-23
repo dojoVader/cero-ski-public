@@ -31,20 +31,8 @@ export class Skier extends Entity {
         super(x, y);
         this.setId('skier');
     }
-
-    setDirection(direction: number) {
-        this.direction = direction;
-        this.updateAsset();
-    }
-
-    updateAsset() {
-        const jumpAsset = Constants.SKIER_DIRECTION_ASSET[this.direction];
-        this.assetName = this.isJumping ?
-            jumpAsset[this.jumpingIndex] as string : Constants.SKIER_DIRECTION_ASSET[this.direction] as string;
-    }
-
     move() {
-        // 
+        // calculate the diff between frames per second as specificed for each animation and
         if (this.isJumping) {
             if (!LAST_WHEN_UPDATED_TIME) LAST_WHEN_UPDATED_TIME = this.millis;
             TIME_ELAPSED = this.millis - LAST_WHEN_UPDATED_TIME;
@@ -77,6 +65,24 @@ export class Skier extends Entity {
                 break;
         }
     }
+
+    setDirection(direction: number) {
+        this.direction = direction;
+        this.updateAsset();
+    }
+
+    updateAsset() {
+        const jumpAsset = Constants.SKIER_DIRECTION_ASSET[this.direction];
+        this.assetName = this.isJumping ?
+            jumpAsset[this.jumpingIndex] as string : Constants.SKIER_DIRECTION_ASSET[this.direction] as string;
+    }
+
+    getAsset(){
+        this.updateAsset();
+        return this.assetName;
+    }
+
+    
 
     moveSkierLeft() {
         this.x -= Constants.SKIER_STARTING_SPEED;
@@ -118,14 +124,8 @@ export class Skier extends Entity {
 
     jump() {
         this.isJumping = true;
-
-
         this.setDirection(Constants.SKIER_DIRECTIONS.JUMP);
-
-
     }
-
-
 
     turnRight() {
         if (this.direction === Constants.SKIER_DIRECTIONS.RIGHT) {
@@ -148,6 +148,7 @@ export class Skier extends Entity {
 
     checkIfSkierHitObstacle(obstacleManager: ObstacleManager, assetManager: AssetManager) {
         const asset = assetManager.getAsset(this.assetName);
+        if(!asset) return ; // Hack: it occurs that we get an undefined assets, possibly direction issue
         const skierBounds = new Rect(
             this.x - asset.width / 2,
             this.y - asset.height / 2,
