@@ -68,7 +68,7 @@ export class Game {
         if (this.isGameOver) return;
         GAME_SCORE++;
         let elapsed = Math.abs(TIME_START - e) / 1000;
-        if (elapsed > 20) {
+        if (elapsed > 10) {
             this.rhino.showRhino = true;
         }
 
