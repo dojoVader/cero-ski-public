@@ -70,31 +70,6 @@ export class Rhino extends Entity {
             this.y - asset.height / 4
         );
 
-        // We need to check if there is an obstacle close to us
-        // const collisionEntity: Entity = obstacleManager.getObstacles().find((obstacle: Obstacle) => {
-        //     const obstacleAsset = assetManager.getAsset(obstacle.getAssetName());
-        //     const obstaclePosition = obstacle.getPosition();
-        //     const obstacleBounds = new Rect(
-        //         obstaclePosition.x - obstacleAsset.width / 2,
-        //         obstaclePosition.y - obstacleAsset.height / 2,
-        //         obstaclePosition.x + obstacleAsset.width / 2,
-        //         obstaclePosition.y
-        //     );
-
-        //     return intersectTwoRects(rhinoBounds, obstacleBounds);
-        // });
-        // if (collisionEntity) {
-        //     //If the item is in our way move out of it
-        //     if (collisionEntity.x > this.x) {
-        //         this.setDirection(Constants.RHINO_DIRECTIONS.LEFT);
-        //     }
-
-        //     if (collisionEntity.x < this.x) {
-        //         this.setDirection(Constants.RHINO_DIRECTIONS.RIGHT);
-        //     }
-        // }
-
-
         const distanceBetween = distance(this, skier);
 
         console.log('Distance: %d', distanceBetween);
@@ -109,19 +84,25 @@ export class Rhino extends Entity {
             skier.shouldRender = false;
         }
 
-        // else {
 
-        //     if (skier.x > this.x) {
-        //         this.x -= Math.abs(skier.x);
-        //         this.turnLeft();
 
-        //     }
-        //     else {
-        //         this.x = Math.abs(skier.x);
-        //         this.turnRight();
-        //     }
-        // }
-    } 
+        if (skier.x > this.x && distanceBetween > 21) {
+            this.moveRhinoRight();
+            this.moveRhinoDown();
+            
+
+        }
+        if (skier.x < this.x && distanceBetween > 21) {
+            this.moveRhinoLeft();
+            this.moveRhinoDown();
+        
+            
+
+        }
+
+
+
+    }
 
     move() {
         if (this.isEating) {
@@ -133,8 +114,8 @@ export class Rhino extends Entity {
                     EAT_SEQUENCE_INDEX = 0;
                     this.setDirection(Constants.RHINO_DIRECTIONS.STOP);
                     this.caughtSkier = true;
-                    
-                 
+
+
                 } else {
                     EAT_SEQUENCE_INDEX++;
                 }
@@ -158,7 +139,7 @@ export class Rhino extends Entity {
     }
 
     moveRhinoLeft() {
-        this.x -= Constants.RHINO_SPEED;
+        this.x -= this.speed;
 
     }
 
@@ -168,12 +149,12 @@ export class Rhino extends Entity {
     }
 
     moveRhinoRight() {
-        this.x += Constants.RHINO_SPEED;
+        this.x += this.speed;
 
     }
 
     moveRhinoUp() {
-        this.y -= Constants.RHINO_SPEED;
+        this.y -= this.speed;
     }
 
     turnLeft() {

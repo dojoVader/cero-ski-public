@@ -31,7 +31,7 @@ export const RHINO_MOVEMENT2 = 'rhino_move2';
 
 export const SKIER_STARTING_SPEED = 10;
 export const SKIER_DIAGONAL_SPEED_REDUCER = 1.4142;
-export const RHINO_SPEED = 6;
+export const RHINO_SPEED = 2.00;
 
 
 export const ASSETS = {
