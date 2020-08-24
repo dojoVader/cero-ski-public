@@ -28,10 +28,11 @@ export const RHINO_SEQUENCE5 = 'rhino_lift_eat_5';
 export const RHINO_SEQUENCE6 = 'rhino_lift_eat_6';
 export const RHINO_MOVEMENT = 'rhino_move1';
 export const RHINO_MOVEMENT2 = 'rhino_move2';
+export const BOSS_MODE = 'boss';
 
 export const SKIER_STARTING_SPEED = 10;
 export const SKIER_DIAGONAL_SPEED_REDUCER = 1.4142;
-export const RHINO_SPEED = 4.00;
+export const RHINO_SPEED = 2.00;
 
 
 export const ASSETS = {
@@ -59,7 +60,8 @@ export const ASSETS = {
     [RHINO_SEQUENCE5]: 'img/rhino_lift_mouth_open.png',
     [RHINO_SEQUENCE6]: 'img/rhino_lift.png',
     [RHINO_MOVEMENT]: 'img/rhino_run_left.png',
-    [RHINO_MOVEMENT2]: 'img/rhino_run_left_2.png'
+    [RHINO_MOVEMENT2]: 'img/rhino_run_left_2.png',
+    [BOSS_MODE]:'img/boss-icon.png'
 
 };
 

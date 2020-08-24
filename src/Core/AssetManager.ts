@@ -13,7 +13,6 @@ export class AssetManager {
             const assetPromise = this.loadSingleAsset(assetUrl, assetName);
             assetPromises.push(assetPromise);
         }
-        console.log(this.loadedAssets);
         await Promise.all(assetPromises);
     }
 

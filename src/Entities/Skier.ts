@@ -119,6 +119,11 @@ export class Skier extends Entity {
         else {
             if (this.direction !== Constants.SKIER_DIRECTIONS.CRASH) {
                 this.setDirection(this.direction - 1);
+                
+            }
+            else{
+                this.setDirection(Constants.SKIER_DIRECTIONS.LEFT);
+                this.moveSkierLeft();
             }
 
         }
@@ -135,6 +140,7 @@ export class Skier extends Entity {
         }
         else {
             this.setDirection(this.direction + 1);
+            
         }
     }
 
@@ -175,7 +181,6 @@ export class Skier extends Entity {
             // There is a collision if it is a ramp make skier jump or make skier skip obstacle when in jump mode
             if (!this.isJumping) {
                 this.setDirection(Constants.SKIER_DIRECTIONS.CRASH);
-                console.log("Skier: %o, Collision: %o",skierBounds, collision);
                 return true;
             }
 

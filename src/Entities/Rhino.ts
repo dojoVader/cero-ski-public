@@ -34,11 +34,17 @@ export class Rhino extends Entity {
     isEating = false;
 
     caughtSkier = false;
+
+    showRhino = false;
+
+    distance = null;
+
     constructor(x: number, y: number) {
         super(x, y);
         this.setId('rhino');
         this.setDirection(Constants.RHINO_DIRECTIONS.DOWN);
         this.isEating = false;
+        this.showRhino = false;
     }
 
     setDirection(direction: number) {
@@ -70,14 +76,14 @@ export class Rhino extends Entity {
             this.y - asset.height / 4
         );
 
-        const distanceBetween = distance(this, skier);
+        const distanceBetween = Math.abs(distance(this, skier));
+        this.distance = distanceBetween;
+
 
         if (distanceBetween <= 20) {
             this.isEating = true;
             this.setDirection(Constants.RHINO_DIRECTIONS.EAT);
             skier.setDirection(Constants.SKIER_DIRECTIONS.CRASH)
-            console.log('Distance: %d', distanceBetween);
-            console.log(this);
             skier.shouldRender = false;
         }
 
@@ -95,14 +101,15 @@ export class Rhino extends Entity {
         }
 
         // If we have passed the Rhino let it slow down
-        if(this.y > skier.y && distanceBetween > 21){
-            this.y-=this.speed;
+        if (this.y > skier.y && distanceBetween > 21) {
+            this.y -= this.speed;
             this.setDirection(Constants.RHINO_DIRECTIONS.STOP);
         }
 
 
 
     }
+
 
     move() {
         if (this.isEating) {
@@ -190,6 +197,27 @@ export class Rhino extends Entity {
 
     turnDown() {
         this.setDirection(Constants.RHINO_DIRECTIONS.DOWN);
+    }
+
+    draw(canvas: Canvas, assetManager: AssetManager) {
+        if (this.showRhino) {
+            super.draw(canvas, assetManager);
+            this.showBossMode(assetManager, canvas)
+        }
+
+    }
+
+    showBossMode(assetMgr: AssetManager, canvas: Canvas) {
+        // We will create a simple boss icon to inform the user that boss has entered the scene
+        const asset = assetMgr.getAsset(Constants.BOSS_MODE);
+        const xPos = 14;
+        const yPos = 120;
+        canvas.ctx.drawImage(asset, xPos, yPos, asset.width, asset.height);
+        canvas.ctx.save();
+        canvas.ctx.fillStyle = 'red';
+        canvas.ctx.fillText(this.caughtSkier ? 'Another Ski casualty :(' : 'Wild Rhino on the loose', xPos + 24, 143);
+        canvas.ctx.fillText(this.showRhino ? `Distance: ${this.distance}` : '',xPos + 25, 173);
+        canvas.ctx.restore();
     }
 
 
