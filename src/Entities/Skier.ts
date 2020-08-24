@@ -30,6 +30,8 @@ export class Skier extends Entity {
     constructor(x: number, y: number) {
         super(x, y);
         this.setId('skier');
+        this.isJumping = false;
+        
     }
     move() {
         // calculate the diff between frames per second as specificed for each animation and

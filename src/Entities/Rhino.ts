@@ -38,6 +38,7 @@ export class Rhino extends Entity {
         super(x, y);
         this.setId('rhino');
         this.setDirection(Constants.RHINO_DIRECTIONS.DOWN);
+        this.isEating = false;
     }
 
     setDirection(direction: number) {

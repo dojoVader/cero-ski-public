@@ -61,6 +61,7 @@ export class Game {
     }
 
     run(e?: number) {
+        if (this.isGameOver) return;
         let elapsed = Math.abs(TIME_START - e) / 1000;
 
 
@@ -76,6 +77,7 @@ export class Game {
     }
 
     updateGameWindow() {
+
         this.skier.move();
         // console.log('Skier Data: X:%d , Y:%d , Dir:%s', this.skier.x, this.skier.y, this.skier.direction );
         // console.log('Rhino Data: X:%d , Y:%d , Dir:%s', this.rhino.x, this.rhino.y, this.rhino.direction );
@@ -101,8 +103,24 @@ export class Game {
         // If the skier is caught
         if (this.rhino.caughtSkier) {
             this.pauseUI.display(this.canvas, 'Game over!, Press R to restart');
+            this.isGameOver = true;
             cancelAnimationFrame(this.animationID);
+
         }
+    }
+
+    reset() {
+        delete this.skier;
+        delete this.rhino;
+        this.skier = new Skier(0, 0);
+        this.rhino = new Rhino(0, -100);
+        this.rhino.setDirection(Constants.RHINO_DIRECTIONS.DOWN);
+        this.obstacleManager = new ObstacleManager();
+        this.init();
+        
+        this.isGameOver = false;
+        this.rhino.caughtSkier = false;
+        this.run();
     }
 
     calculateGameWindow() {
@@ -152,6 +170,16 @@ export class Game {
                 // Implement the jump functionality
                 this.skier.jump();
                 event.preventDefault();
+                break;
+
+            case Constants.KEYS.R:
+                // Reset the game application
+                if (this.isGameOver) {
+                    this.canvas.clearCanvas();
+                    this.reset();
+
+                }
+
                 break;
 
         }
