@@ -91,3 +91,49 @@ how creative candidates get with this.
 * Write more unit tests for your code
 
 We are looking forward to see what you come up with!
+
+## COMMENT
+
+#### What was done ? 
+
+* I re-structured the code to be re-written in TypeScript so that it can be easy to maintain and get alot of static typing
+
+* Fix the bug issue related with the left direction, now when it crashes it still works
+
+* I somewhat implemented the Jump feature that happen when you press J
+
+* I also implemented the Score and it persists across browser
+
+* I implemented a way to ensure both the Jump and Walk and eat animation is as smooth as possible
+
+* I implemented the Pause functionality and rendered a UI and it resumes when you press P 
+
+* I implemented the Game over screen and a key R to reset the game
+
+* I implemented a Boss mode, this shows the Rhino and the distance between the Rhino and the character
+
+#### What was not done ? 
+
+* Testing: I wrote some Test, however I spent alot of time dealing with issue of Jest and it occurred to me that unlike Jasmine which uses Karma as a test runner with a real browser, I could not advance with JSDOM, so I wrote some small test for the utility class.
+
+
+
+#### Featured Added
+
+* HighScore
+* GameSpeed increases
+* Pause functionality
+* Jump Ramp added
+* Rhino chases user
+* Boss mode implemented
+* UI Distance Enabled
+* Reset mode added
+
+#### Bugs
+
+* There are times when it crashes into the tree, if you spend too much time, it shows game over, 
+
+## How to run
+
+* Run npm i to install
+* Run npm run dev after installation of Node Modules
