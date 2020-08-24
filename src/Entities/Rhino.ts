@@ -80,10 +80,9 @@ export class Rhino extends Entity {
         this.distance = distanceBetween;
 
 
-        if (distanceBetween <= 20) {
+        if (distanceBetween <= 23 && this.showRhino) {
             this.isEating = true;
             this.setDirection(Constants.RHINO_DIRECTIONS.EAT);
-            skier.setDirection(Constants.SKIER_DIRECTIONS.CRASH)
             skier.shouldRender = false;
         }
 

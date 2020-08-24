@@ -31,7 +31,7 @@ export class Skier extends Entity {
         super(x, y);
         this.setId('skier');
         this.isJumping = false;
-        
+
     }
     move() {
         // calculate the diff between frames per second as specificed for each animation and
@@ -43,7 +43,7 @@ export class Skier extends Entity {
                     this.isJumping = false;
                     this.jumpingIndex = 0;
                     this.setDirection(Constants.SKIER_DIRECTIONS.DOWN);
-                }else {
+                } else {
                     this.jumpingIndex++;
                 }
                 LAST_WHEN_UPDATED_TIME = this.millis;
@@ -79,12 +79,12 @@ export class Skier extends Entity {
             jumpAsset[this.jumpingIndex] as string : Constants.SKIER_DIRECTION_ASSET[this.direction] as string;
     }
 
-    getAsset(){
+    getAsset() {
         this.updateAsset();
         return this.assetName;
     }
 
-    
+
 
     moveSkierLeft() {
         this.x -= Constants.SKIER_STARTING_SPEED;
@@ -119,9 +119,9 @@ export class Skier extends Entity {
         else {
             if (this.direction !== Constants.SKIER_DIRECTIONS.CRASH) {
                 this.setDirection(this.direction - 1);
-                
+
             }
-            else{
+            else {
                 this.setDirection(Constants.SKIER_DIRECTIONS.LEFT);
                 this.moveSkierLeft();
             }
@@ -140,7 +140,7 @@ export class Skier extends Entity {
         }
         else {
             this.setDirection(this.direction + 1);
-            
+
         }
     }
 
@@ -156,7 +156,7 @@ export class Skier extends Entity {
 
     checkIfSkierHitObstacle(obstacleManager: ObstacleManager, assetManager: AssetManager) {
         const asset = assetManager.getAsset(this.assetName);
-        if(!asset) return ; // Hack: it occurs that we get an undefined assets, possibly direction issue
+        if (!asset) return; // Hack: it occurs that we get an undefined assets, possibly direction issue
         const skierBounds = new Rect(
             this.x - asset.width / 2,
             this.y - asset.height / 2,
@@ -179,10 +179,10 @@ export class Skier extends Entity {
         if (!collision) return;
         if (collision.id !== 'jumping_ramp' && collision.id !== 'rock') {
             // There is a collision if it is a ramp make skier jump or make skier skip obstacle when in jump mode
-            if (!this.isJumping) {
-                this.setDirection(Constants.SKIER_DIRECTIONS.CRASH);
-                return true;
-            }
+
+            this.setDirection(Constants.SKIER_DIRECTIONS.CRASH);
+            return true;
+
 
         }
         else {
