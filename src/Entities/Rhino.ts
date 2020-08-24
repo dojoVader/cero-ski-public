@@ -53,7 +53,7 @@ export class Rhino extends Entity {
             case Constants.RHINO_DIRECTIONS.LEFT:
             case Constants.RHINO_DIRECTIONS.RIGHT:
             case Constants.RHINO_DIRECTIONS.STOP:
-                this.assetName = Constants.RHINO_DIRECTION_ASSETS[Constants.RHINO_DIRECTIONS.LEFT] as string;
+                this.assetName = Constants.RHINO_DIRECTION_ASSETS[Constants.RHINO_DIRECTIONS.LEFT][MOVE_SEQUENCE_INDEX] as string;
                 break;
             case Constants.RHINO_DIRECTIONS.EAT:
                 this.assetName = Constants.RHINO_DIRECTION_ASSETS[Constants.RHINO_DIRECTIONS.EAT][EAT_SEQUENCE_INDEX];
@@ -72,9 +72,6 @@ export class Rhino extends Entity {
 
         const distanceBetween = distance(this, skier);
 
-        console.log('Distance: %d', distanceBetween);
-        console.log(this);
-
         if (distanceBetween <= 20) {
             this.isEating = true;
             this.setDirection(Constants.RHINO_DIRECTIONS.EAT);
@@ -89,15 +86,18 @@ export class Rhino extends Entity {
         if (skier.x > this.x && distanceBetween > 21) {
             this.moveRhinoRight();
             this.moveRhinoDown();
-            
+
 
         }
         if (skier.x < this.x && distanceBetween > 21) {
             this.moveRhinoLeft();
             this.moveRhinoDown();
-        
-            
+        }
 
+        // If we have passed the Rhino let it slow down
+        if(this.y > skier.y && distanceBetween > 21){
+            this.y-=this.speed;
+            this.setDirection(Constants.RHINO_DIRECTIONS.STOP);
         }
 
 
@@ -118,6 +118,21 @@ export class Rhino extends Entity {
 
                 } else {
                     EAT_SEQUENCE_INDEX++;
+                }
+                LAST_WHEN_UPDATED_TIME = this.millis;
+            }
+        } else {
+            this.updateAsset();
+            if (!LAST_WHEN_UPDATED_TIME) LAST_WHEN_UPDATED_TIME = this.millis;
+            TIME_ELAPSED = this.millis - LAST_WHEN_UPDATED_TIME;
+            if (TIME_ELAPSED > MOVE_ANIMATION_PER_FRAME) {
+                if (MOVE_SEQUENCE_INDEX === (TOTAL_MOVE_FRAMES - 1)) {
+                    this.isEating = false;
+                    MOVE_SEQUENCE_INDEX = 0;
+
+
+                } else {
+                    MOVE_SEQUENCE_INDEX++;
                 }
                 LAST_WHEN_UPDATED_TIME = this.millis;
             }

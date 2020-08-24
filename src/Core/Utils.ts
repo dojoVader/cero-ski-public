@@ -30,3 +30,4 @@ export class Rect {
         this.bottom = bottom;
     }
 }
+
