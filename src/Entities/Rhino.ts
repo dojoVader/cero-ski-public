@@ -8,6 +8,7 @@ import { ObstacleManager } from "./Obstacles/ObstacleManager";
 import { Obstacle } from "./Obstacles/Obstacle";
 import { PauseInfo } from "./PauseInfo";
 import { Game } from "../Core/Game";
+import { IAnimation } from "../game.interface";
 
 const TOTAL_EAT_FRAMES = 6;
 
@@ -17,15 +18,11 @@ const EAT_ANIMATION_PER_FRAME = 600 / TOTAL_EAT_FRAMES;
 
 const MOVE_ANIMATION_PER_FRAME = 200 / TOTAL_MOVE_FRAMES;
 
-let LAST_WHEN_UPDATED_TIME;
 
-let TIME_ELAPSED;
 
-let EAT_SEQUENCE_INDEX = 0;
 
-let MOVE_SEQUENCE_INDEX = 0;
 
-export class Rhino extends Entity {
+export class Rhino extends Entity implements IAnimation<Rhino> {
 
     assetName: string = Constants.RHINO_MOVEMENT;
 
@@ -39,6 +36,10 @@ export class Rhino extends Entity {
 
     distance = null;
 
+    eatSequenceIndex = 0;
+
+    moveSequenceIndex = 0;
+
     constructor(x: number, y: number) {
         super(x, y);
         this.setId('rhino');
@@ -46,6 +47,8 @@ export class Rhino extends Entity {
         this.isEating = false;
         this.showRhino = false;
     }
+    lastUpdated: number;
+    timeElapsed: number;
 
     setDirection(direction: number) {
         this.direction = direction;
@@ -59,10 +62,10 @@ export class Rhino extends Entity {
             case Constants.RHINO_DIRECTIONS.LEFT:
             case Constants.RHINO_DIRECTIONS.RIGHT:
             case Constants.RHINO_DIRECTIONS.STOP:
-                this.assetName = Constants.RHINO_DIRECTION_ASSETS[Constants.RHINO_DIRECTIONS.LEFT][MOVE_SEQUENCE_INDEX] as string;
+                this.assetName = Constants.RHINO_DIRECTION_ASSETS[Constants.RHINO_DIRECTIONS.LEFT][this.moveSequenceIndex] as string;
                 break;
             case Constants.RHINO_DIRECTIONS.EAT:
-                this.assetName = Constants.RHINO_DIRECTION_ASSETS[Constants.RHINO_DIRECTIONS.EAT][EAT_SEQUENCE_INDEX];
+                this.assetName = Constants.RHINO_DIRECTION_ASSETS[Constants.RHINO_DIRECTIONS.EAT][this.eatSequenceIndex];
                 break;
         }
     }
@@ -104,44 +107,25 @@ export class Rhino extends Entity {
             this.y -= this.speed;
             this.setDirection(Constants.RHINO_DIRECTIONS.STOP);
         }
-
-
-
     }
 
 
     move() {
         if (this.isEating) {
-            if (!LAST_WHEN_UPDATED_TIME) LAST_WHEN_UPDATED_TIME = this.millis;
-            TIME_ELAPSED = this.millis - LAST_WHEN_UPDATED_TIME;
-            if (TIME_ELAPSED > EAT_ANIMATION_PER_FRAME) {
-                if (EAT_SEQUENCE_INDEX === (TOTAL_EAT_FRAMES - 1)) {
+            this._animate(EAT_ANIMATION_PER_FRAME, TOTAL_EAT_FRAMES, 'eatSequenceIndex',
+                () => {
                     this.isEating = false;
-                    EAT_SEQUENCE_INDEX = 0;
+                    this.eatSequenceIndex = 0;
                     this.setDirection(Constants.RHINO_DIRECTIONS.STOP);
                     this.caughtSkier = true;
-
-
-                } else {
-                    EAT_SEQUENCE_INDEX++;
-                }
-                LAST_WHEN_UPDATED_TIME = this.millis;
-            }
+                })
         } else {
             this.updateAsset();
-            if (!LAST_WHEN_UPDATED_TIME) LAST_WHEN_UPDATED_TIME = this.millis;
-            TIME_ELAPSED = this.millis - LAST_WHEN_UPDATED_TIME;
-            if (TIME_ELAPSED > MOVE_ANIMATION_PER_FRAME) {
-                if (MOVE_SEQUENCE_INDEX === (TOTAL_MOVE_FRAMES - 1)) {
+            this._animate(MOVE_ANIMATION_PER_FRAME, TOTAL_MOVE_FRAMES, 'moveSequenceIndex',
+                () => {
                     this.isEating = false;
-                    MOVE_SEQUENCE_INDEX = 0;
-
-
-                } else {
-                    MOVE_SEQUENCE_INDEX++;
-                }
-                LAST_WHEN_UPDATED_TIME = this.millis;
-            }
+                    this.moveSequenceIndex = 0;
+                })
         }
         switch (this.direction) {
             case Constants.RHINO_DIRECTIONS.LEFT:
@@ -161,7 +145,6 @@ export class Rhino extends Entity {
 
     moveRhinoLeft() {
         this.x -= this.speed;
-
     }
 
 
@@ -171,7 +154,6 @@ export class Rhino extends Entity {
 
     moveRhinoRight() {
         this.x += this.speed;
-
     }
 
     moveRhinoUp() {
@@ -206,6 +188,19 @@ export class Rhino extends Entity {
 
     }
 
+    private _animate(fps: number, totalFrames: number, sequenceProps: keyof Rhino, onFinalFrameCallback: Function) {
+        if (!this.lastUpdated) this.lastUpdated = this.millis;
+        this.timeElapsed = this.millis - this.lastUpdated;
+        if (this.timeElapsed > fps) {
+            if (this[sequenceProps] === (totalFrames - 1)) {
+                onFinalFrameCallback();
+            } else {
+                (this[sequenceProps] as number)++;
+            }
+            this.lastUpdated = this.millis;
+        }
+    }
+
     showBossMode(assetMgr: AssetManager, canvas: Canvas) {
         // We will create a simple boss icon to inform the user that boss has entered the scene
         const asset = assetMgr.getAsset(Constants.BOSS_MODE);
@@ -215,7 +210,7 @@ export class Rhino extends Entity {
         canvas.ctx.save();
         canvas.ctx.fillStyle = 'red';
         canvas.ctx.fillText(this.caughtSkier ? 'Another Ski casualty :(' : 'Wild Rhino on the loose', xPos + 24, 143);
-        canvas.ctx.fillText(this.showRhino ? `Distance: ${this.distance}` : '',xPos + 25, 173);
+        canvas.ctx.fillText(this.showRhino ? `Distance: ${this.distance}` : '', xPos + 25, 173);
         canvas.ctx.restore();
     }
 

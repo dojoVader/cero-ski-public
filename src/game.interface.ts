@@ -27,3 +27,8 @@ export interface ICollision {
     isCollision: boolean,
     obstacle: Obstacle
 }
+
+export interface IAnimation<T> {
+    lastUpdated: number;
+    timeElapsed: number;
+}

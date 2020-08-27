@@ -2,7 +2,7 @@ import * as Constants from "../Constants";
 import { Entity } from "./Entity";
 import { intersectTwoRects, Rect } from "../Core/Utils";
 import { Obstacle } from "./Obstacles/Obstacle";
-import { ICollision } from "../game.interface";
+import { IAnimation, ICollision } from "../game.interface";
 import { ObstacleManager } from "./Obstacles/ObstacleManager";
 import { AssetManager } from "../Core/AssetManager";
 
@@ -14,7 +14,7 @@ let LAST_WHEN_UPDATED_TIME;
 
 let TIME_ELAPSED;
 
-export class Skier extends Entity {
+export class Skier extends Entity implements IAnimation<Skier> {
 
 
 
@@ -33,21 +33,17 @@ export class Skier extends Entity {
         this.isJumping = false;
 
     }
+    lastUpdated: number;
+    timeElapsed: number;
     move() {
         // calculate the diff between frames per second as specificed for each animation and
         if (this.isJumping) {
-            if (!LAST_WHEN_UPDATED_TIME) LAST_WHEN_UPDATED_TIME = this.millis;
-            TIME_ELAPSED = this.millis - LAST_WHEN_UPDATED_TIME;
-            if (TIME_ELAPSED > ANIMATION_PER_FRAME) {
-                if (this.jumpingIndex === 4) {
+            this._animate(ANIMATION_PER_FRAME, TOTAL_JUMP_FRAMES, 'jumpingIndex',
+                () => {
                     this.isJumping = false;
                     this.jumpingIndex = 0;
                     this.setDirection(Constants.SKIER_DIRECTIONS.DOWN);
-                } else {
-                    this.jumpingIndex++;
-                }
-                LAST_WHEN_UPDATED_TIME = this.millis;
-            }
+                })
         }
         switch (this.direction) {
             case Constants.SKIER_DIRECTIONS.LEFT_DOWN:
@@ -154,6 +150,19 @@ export class Skier extends Entity {
         this.setDirection(Constants.SKIER_DIRECTIONS.DOWN);
     }
 
+    private _animate(fps: number, totalFrames: number, sequenceProps: keyof Skier, cb: Function) {
+        if (!this.lastUpdated) this.lastUpdated = this.millis;
+        this.timeElapsed = this.millis - this.lastUpdated;
+        if (this.timeElapsed > fps) {
+            if (this[sequenceProps] === (totalFrames - 1)) {
+                cb();
+            } else {
+                (this[sequenceProps] as number)++;
+            }
+            this.lastUpdated = this.millis;
+        }
+    }
+
     checkIfSkierHitObstacle(obstacleManager: ObstacleManager, assetManager: AssetManager) {
         const asset = assetManager.getAsset(this.assetName);
         if (!asset) return; // Hack: it occurs that we get an undefined assets, possibly direction issue
@@ -179,10 +188,10 @@ export class Skier extends Entity {
         if (!collision) return;
         if (collision.id !== 'jumping_ramp' && collision.id !== 'rock') {
             // There is a collision if it is a ramp make skier jump or make skier skip obstacle when in jump mode
-
-            this.setDirection(Constants.SKIER_DIRECTIONS.CRASH);
-            return true;
-
+            if (!this.isJumping) {
+                this.setDirection(Constants.SKIER_DIRECTIONS.CRASH);
+                return true;
+            }
 
         }
         else {

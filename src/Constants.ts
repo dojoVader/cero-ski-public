@@ -32,7 +32,7 @@ export const BOSS_MODE = 'boss';
 
 export const SKIER_STARTING_SPEED = 10;
 export const SKIER_DIAGONAL_SPEED_REDUCER = 1.4142;
-export const RHINO_SPEED = 4.50;
+export const RHINO_SPEED = 4.70;
 
 
 export const ASSETS = {
